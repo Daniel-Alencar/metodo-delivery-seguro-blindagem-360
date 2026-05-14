@@ -303,6 +303,52 @@ function AdminPage() {
           </div>
         </section>
       )}
+
+      {isAdmin && <FollowupPanel />}
     </div>
+  );
+}
+
+function FollowupPanel() {
+  const [email, setEmail] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function extend() {
+    setMsg(null); setBusy(true);
+    const { data: u, error: e1 } = await supabase.rpc("admin_find_user_by_email", { _email: email.trim() });
+    if (e1 || !u || !u[0]) { setMsg("Usuário não encontrado."); setBusy(false); return; }
+    const { data, error } = await supabase.rpc("admin_extend_followup", { _user_id: u[0].user_id, _days: 30 });
+    setBusy(false);
+    if (error) { setMsg(error.message); return; }
+    setMsg(`Acompanhamento liberado até ${new Date(data as string).toLocaleDateString("pt-BR")}.`);
+    setEmail("");
+  }
+
+  return (
+    <section>
+      <div className="flex items-center gap-2">
+        <HeartPulse className="h-4 w-4 text-muted-foreground" />
+        <h2 className="text-2xl font-semibold tracking-tight">Acompanhamento pré-pago</h2>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Após confirmar o pagamento por fora, libere 30 dias de acompanhamento pelo e-mail do mentorado.
+        Se a conta estiver arquivada, ela é reativada automaticamente como graduada.
+      </p>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <input
+          type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@mentorado.com"
+          className="flex-1 rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-foreground/40"
+        />
+        <button
+          onClick={extend} disabled={busy || !email.trim()}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background disabled:opacity-50"
+        >
+          <RotateCcw className="h-3.5 w-3.5" /> Liberar +30 dias
+        </button>
+      </div>
+      {msg && <p className="mt-3 text-xs text-amber-300">{msg}</p>}
+    </section>
   );
 }
