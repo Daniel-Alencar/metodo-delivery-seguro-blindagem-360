@@ -37,21 +37,45 @@ const journey = [
     month: "Mês 1",
     title: "Fundação Jurídica",
     desc: "Base societária, ativos e estrutura formal de proteção.",
+    weeks: [
+      "Semana 1 — Diagnóstico societário e mapeamento de ativos",
+      "Semana 2 — Estrutura jurídica e separação patrimonial",
+      "Semana 3 — Documentos fundadores e governança inicial",
+      "Semana 4 — Validação da fundação + checkpoint com mentor",
+    ],
   },
   {
     month: "Mês 2",
     title: "Operação Crítica",
     desc: "Delivery, contratos, logística e primeiros documentos operacionais.",
+    weeks: [
+      "Semana 1 — Contratos com motoboys e parceiros logísticos",
+      "Semana 2 — Termos de marketplace e plataformas de delivery",
+      "Semana 3 — Protocolos de expedição, lacre e rastreabilidade",
+      "Semana 4 — Auditoria operacional + checkpoint com mentor",
+    ],
   },
   {
     month: "Mês 3",
     title: "Equipe & Prova Interna",
     desc: "Jornada, benefícios, sigilo, treinamento e disciplina.",
+    weeks: [
+      "Semana 1 — Jornada, ponto e política de benefícios",
+      "Semana 2 — Acordos de sigilo, código de conduta e disciplina",
+      "Semana 3 — Treinamento operacional e trilhas de evidência",
+      "Semana 4 — Simulação de incidente interno + checkpoint",
+    ],
   },
   {
     month: "Mês 4",
     title: "Defesa Externa",
     desc: "Consumo, notificações, fiscalização e consolidação da blindagem.",
+    weeks: [
+      "Semana 1 — Atendimento ao consumidor e Procon",
+      "Semana 2 — Resposta a notificações e órgãos fiscalizadores",
+      "Semana 3 — Crise digital, redes sociais e reputação",
+      "Semana 4 — Certificação Delivery Seguro + plano de monitoramento",
+    ],
   },
 ];
 
