@@ -472,6 +472,9 @@ export type Database = {
         | "paused"
         | "completed"
         | "cancelled"
+        | "graduated"
+        | "archiving"
+        | "archived"
       incident_category:
         | "procon"
         | "chargeback"
@@ -479,6 +482,7 @@ export type Database = {
         | "trabalhista"
         | "midia_social"
         | "outros"
+        | "consultation"
       incident_status: "open" | "in_progress" | "resolved" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
@@ -615,6 +619,9 @@ export const Constants = {
         "paused",
         "completed",
         "cancelled",
+        "graduated",
+        "archiving",
+        "archived",
       ],
       incident_category: [
         "procon",
@@ -623,6 +630,7 @@ export const Constants = {
         "trabalhista",
         "midia_social",
         "outros",
+        "consultation",
       ],
       incident_status: ["open", "in_progress", "resolved", "closed"],
       week_status: ["locked", "in_progress", "submitted", "approved"],
