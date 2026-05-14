@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText } from "lucide-react";
+import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, HeartPulse, Download, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -13,6 +13,7 @@ type Module = { id: string; month_index: number; title: string; description: str
 type Week = { id: string; module_id: string; week_index: number; title: string; is_checkpoint: boolean };
 type Enrollment = {
   id: string; status: string; started_at: string | null; user_id: string;
+  completed_at: string | null; archive_at: string | null; next_step_chosen_at: string | null;
 };
 type Progress = {
   id: string; week_id: string; status: "locked" | "in_progress" | "submitted" | "approved";
