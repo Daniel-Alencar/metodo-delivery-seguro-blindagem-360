@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,11 +15,24 @@ type ProgressRow = {
   enrollment_id: string;
 };
 
+type Mentor = { user_id: string; email: string; full_name: string; is_admin: boolean; granted_at: string };
+
 function AdminPage() {
-  const { isStaff, loading: authLoading } = useAuth();
+  const { isStaff, roles, loading: authLoading } = useAuth();
+  const isAdmin = roles.includes("admin");
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
+  const [searchMsg, setSearchMsg] = useState<string | null>(null);
+  const [teamBusy, setTeamBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  async function loadMentors() {
+    const { data } = await supabase.rpc("admin_list_mentors");
+    setMentors((data ?? []) as Mentor[]);
+  }
 
   async function load() {
     setLoading(true);
@@ -29,10 +42,41 @@ function AdminPage() {
     ]);
     setEnrollments((e ?? []) as EnrollmentRow[]);
     setPending((p ?? []) as ProgressRow[]);
+    if (isAdmin) await loadMentors();
     setLoading(false);
   }
 
-  useEffect(() => { if (isStaff) load(); }, [isStaff]);
+  useEffect(() => { if (isStaff) load(); /* eslint-disable-next-line */ }, [isStaff, isAdmin]);
+
+  async function findUser() {
+    setSearchMsg(null);
+    setSearchResult(null);
+    if (!searchEmail.trim()) return;
+    const { data, error } = await supabase.rpc("admin_find_user_by_email", { _email: searchEmail.trim() });
+    if (error) { setSearchMsg(error.message); return; }
+    const row = (data ?? [])[0];
+    if (!row) { setSearchMsg("Nenhum usuário encontrado com esse e-mail."); return; }
+    setSearchResult(row);
+  }
+
+  async function grantMentor(userId: string) {
+    setTeamBusy(true);
+    const { error } = await supabase.rpc("admin_grant_mentor", { _user_id: userId });
+    if (error) setSearchMsg(error.message);
+    setSearchResult(null);
+    setSearchEmail("");
+    await loadMentors();
+    setTeamBusy(false);
+  }
+
+  async function revokeMentor(userId: string) {
+    if (!confirm("Remover o papel de mentor deste usuário?")) return;
+    setTeamBusy(true);
+    const { error } = await supabase.rpc("admin_revoke_mentor", { _user_id: userId });
+    if (error) alert(error.message);
+    await loadMentors();
+    setTeamBusy(false);
+  }
 
   async function activate(id: string) {
     await supabase.from("enrollments").update({
@@ -139,6 +183,106 @@ function AdminPage() {
           </div>
         )}
       </section>
+
+      {isAdmin && (
+        <section>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-2xl font-semibold tracking-tight">Equipe de mentores</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Promova outros usuários a mentor. Eles passam a ver o painel admin, aprovar checkpoints e gerenciar incidentes.
+          </p>
+
+          <div className="mt-6 rounded-xl border border-border bg-card/40 p-5">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Convidar mentor</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              O usuário precisa já ter conta criada. Busque pelo e-mail cadastrado.
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <input
+                type="email"
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+                className="flex-1 rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-foreground/40"
+              />
+              <button
+                onClick={findUser}
+                disabled={teamBusy}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background disabled:opacity-50"
+              >
+                <Search className="h-3.5 w-3.5" /> Buscar
+              </button>
+            </div>
+            {searchMsg && <p className="mt-3 text-xs text-amber-300">{searchMsg}</p>}
+            {searchResult && (
+              <div className="mt-3 flex items-center justify-between rounded-lg border border-border bg-background/40 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium">{searchResult.full_name || "—"}</p>
+                  <p className="text-xs text-muted-foreground">{searchResult.email}</p>
+                </div>
+                <button
+                  onClick={() => grantMentor(searchResult.user_id)}
+                  disabled={teamBusy}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs font-medium text-background disabled:opacity-50"
+                >
+                  <UserPlus className="h-3.5 w-3.5" /> Promover a mentor
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Mentores ativos</p>
+            {mentors.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">Nenhum mentor cadastrado ainda.</p>
+            ) : (
+              <div className="mt-3 overflow-hidden rounded-xl border border-border">
+                <table className="w-full text-sm">
+                  <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Nome</th>
+                      <th className="px-4 py-3 text-left">E-mail</th>
+                      <th className="px-4 py-3 text-left">Desde</th>
+                      <th className="px-4 py-3 text-right">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mentors.map((m) => (
+                      <tr key={m.user_id} className="border-t border-border bg-card/30">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            {m.full_name || "—"}
+                            {m.is_admin && (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-300">
+                                <Crown className="h-3 w-3" /> Admin
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{m.email}</td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {new Date(m.granted_at).toLocaleDateString("pt-BR")}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => revokeMentor(m.user_id)}
+                            disabled={teamBusy}
+                            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs hover:bg-card disabled:opacity-50"
+                          >
+                            <UserMinus className="h-3 w-3" /> Remover
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -434,7 +434,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_find_user_by_email: {
+        Args: { _email: string }
+        Returns: {
+          email: string
+          full_name: string
+          user_id: string
+        }[]
+      }
+      admin_grant_mentor: { Args: { _user_id: string }; Returns: undefined }
+      admin_list_mentors: {
+        Args: never
+        Returns: {
+          email: string
+          full_name: string
+          granted_at: string
+          is_admin: boolean
+          user_id: string
+        }[]
+      }
+      admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "mentor" | "cliente"
