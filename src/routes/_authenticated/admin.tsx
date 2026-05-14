@@ -102,7 +102,7 @@ function AdminPage() {
   async function logAttendance(p: ProgressRow) {
     const notes = prompt("Notas da aula (opcional):") ?? "";
     const { error } = await supabase.rpc("log_class_attendance", {
-      _enrollment_id: p.enrollment_id, _week_id: p.week_id, _notes: notes || null,
+      _enrollment_id: p.enrollment_id, _week_id: p.week_id, _notes: notes || undefined,
     });
     if (error) alert(error.message);
     else alert("Atendimento registrado.");
