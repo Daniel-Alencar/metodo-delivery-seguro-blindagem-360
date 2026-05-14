@@ -534,6 +534,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_mentor_monthly_report: {
+        Args: { _month?: string }
+        Returns: {
+          classes_attended: number
+          distinct_students: number
+          followups_extended: number
+          is_admin: boolean
+          mentor_email: string
+          mentor_id: string
+          mentor_name: string
+          total_actions: number
+          weeks_approved: number
+          weeks_released: number
+        }[]
+      }
       admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
       cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
       daily_archive_expired: { Args: never; Returns: number }
