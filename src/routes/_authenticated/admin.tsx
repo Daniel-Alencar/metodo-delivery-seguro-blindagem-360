@@ -202,6 +202,8 @@ function AdminPage() {
         )}
       </section>
 
+      <MonthlyReportPanel />
+
       <AuditLogPanel />
 
       {isAdmin && (
