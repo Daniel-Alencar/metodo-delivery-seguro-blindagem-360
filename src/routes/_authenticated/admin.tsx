@@ -99,6 +99,14 @@ function AdminPage() {
     }).eq("id", id);
     await load();
   }
+  async function logAttendance(p: ProgressRow) {
+    const notes = prompt("Notas da aula (opcional):") ?? "";
+    const { error } = await supabase.rpc("log_class_attendance", {
+      _enrollment_id: p.enrollment_id, _week_id: p.week_id, _notes: notes || null,
+    });
+    if (error) alert(error.message);
+    else alert("Atendimento registrado.");
+  }
 
   if (authLoading) return <div className="flex items-center text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   if (!isStaff) {
