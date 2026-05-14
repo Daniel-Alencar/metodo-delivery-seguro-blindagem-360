@@ -71,7 +71,7 @@ function DashboardPage() {
   }
 
   function isUnlocked(idx: number): boolean {
-    if (!enrollment || enrollment.status !== "active") return false;
+    if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) return false;
     if (idx === 0) return true;
     const prev = orderedWeeks[idx - 1];
     const prevProg = getProgress(prev.id);
@@ -202,6 +202,7 @@ function DashboardPage() {
 
   return (
     <div>
+      {archivingBanner}
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Sua trilha</p>
