@@ -1,35 +1,83 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, BookOpen, GraduationCap, UserCog, Code2 } from "lucide-react";
-import { useState } from "react";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { ArrowLeft, ShieldCheck, BookOpen, GraduationCap, UserCog, Code2, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/manual")({
   head: () => ({
     meta: [
-      { title: "Manual completo — Blindagem 360º" },
-      { name: "description", content: "Manual completo de uso da plataforma Blindagem 360º para alunos, mentores, administradores e desenvolvedores." },
+      { title: "Manual da plataforma — Blindagem 360º" },
+      { name: "description", content: "Manual de uso da plataforma Blindagem 360º conforme o seu perfil." },
     ],
   }),
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/login" });
+  },
   component: ManualPage,
 });
 
 type Tab = "aluno" | "mentor" | "admin" | "dev";
 
+const ALL_TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "aluno", label: "Aluno", icon: GraduationCap },
+  { id: "mentor", label: "Mentor", icon: BookOpen },
+  { id: "admin", label: "Administrador", icon: UserCog },
+  { id: "dev", label: "Desenvolvedor", icon: Code2 },
+];
+
 function ManualPage() {
+  const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState<string[]>([]);
   const [tab, setTab] = useState<Tab>("aluno");
 
-  const tabs: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: "aluno", label: "Aluno", icon: GraduationCap },
-    { id: "mentor", label: "Mentor", icon: BookOpen },
-    { id: "admin", label: "Administrador", icon: UserCog },
-    { id: "dev", label: "Desenvolvedor", icon: Code2 },
-  ];
+  useEffect(() => {
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) { setLoading(false); return; }
+      const { data: r } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", u.user.id);
+      setRoles((r ?? []).map((x: { role: string }) => x.role));
+      setLoading(false);
+    })();
+  }, []);
+
+  const visibleTabs = useMemo(() => {
+    const isAdmin = roles.includes("admin");
+    const isMentor = roles.includes("mentor");
+    return ALL_TABS.filter((t) => {
+      if (t.id === "aluno") return true; // todo logado tem acesso
+      if (t.id === "mentor") return isMentor || isAdmin;
+      if (t.id === "admin" || t.id === "dev") return isAdmin;
+      return false;
+    });
+  }, [roles]);
+
+  // Garante aba válida para o perfil
+  useEffect(() => {
+    if (visibleTabs.length && !visibleTabs.some((t) => t.id === tab)) {
+      const priority: Tab[] = ["dev", "admin", "mentor", "aluno"];
+      const next = priority.find((p) => visibleTabs.some((t) => t.id === p)) ?? "aluno";
+      setTab(next);
+    }
+  }, [visibleTabs, tab]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando manual...
+      </div>
+    );
+  }
 
   return (
     <div className="dark min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Início
+        <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
         <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
           <ShieldCheck className="h-4 w-4" /> Blindagem 360º
@@ -37,13 +85,14 @@ function ManualPage() {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 pb-16">
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Manual completo da plataforma</h1>
+        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Manual da plataforma</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Guia oficial de uso. Selecione o perfil para ver as instruções específicas.
+          Você está vendo apenas as seções correspondentes ao seu perfil
+          {roles.length > 0 && (<> · <span className="text-foreground">{roles.join(" + ")}</span></>)}.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2 border-b border-border">
-          {tabs.map((t) => {
+          {visibleTabs.map((t) => {
             const Icon = t.icon;
             const active = tab === t.id;
             return (
@@ -63,10 +112,10 @@ function ManualPage() {
         </div>
 
         <article className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
-          {tab === "aluno" && <AlunoSection />}
-          {tab === "mentor" && <MentorSection />}
-          {tab === "admin" && <AdminSection />}
-          {tab === "dev" && <DevSection />}
+          {tab === "aluno" && visibleTabs.some((t) => t.id === "aluno") && <AlunoSection />}
+          {tab === "mentor" && visibleTabs.some((t) => t.id === "mentor") && <MentorSection />}
+          {tab === "admin" && visibleTabs.some((t) => t.id === "admin") && <AdminSection />}
+          {tab === "dev" && visibleTabs.some((t) => t.id === "dev") && <DevSection />}
         </article>
       </main>
 
