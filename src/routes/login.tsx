@@ -19,13 +19,27 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       setError(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message);
       return;
     }
-    navigate({ to: "/dashboard" });
+    // Pick destination based on roles
+    const userId = signIn.user!.id;
+    const { data: roleRows } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r) => r.role as string);
+    const isAdmin = roles.includes("admin");
+    const isMentor = roles.includes("mentor");
+    sessionStorage.removeItem("viewAs");
+    setLoading(false);
+    if (isAdmin && isMentor) {
+      navigate({ to: "/escolher-perfil" });
+    } else if (isAdmin || isMentor) {
+      navigate({ to: "/admin" });
+    } else {
+      navigate({ to: "/dashboard" });
+    }
   }
 
   return (

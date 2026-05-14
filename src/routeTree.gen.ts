@@ -11,16 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ModaRouteImport } from './routes/moda'
+import { Route as ManualImpressaoRouteImport } from './routes/manual-impressao'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HofRouteImport } from './routes/hof'
 import { Route as FoodServiceRouteImport } from './routes/food-service'
 import { Route as EsteticaRouteImport } from './routes/estetica'
+import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedIncidentesRouteImport } from './routes/_authenticated/incidentes'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAcompanhamentoRouteImport } from './routes/_authenticated/acompanhamento'
+import { Route as ApiPublicCronArchiveRouteImport } from './routes/api/public/cron-archive'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -30,6 +34,11 @@ const SignupRoute = SignupRouteImport.update({
 const ModaRoute = ModaRouteImport.update({
   id: '/moda',
   path: '/moda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualImpressaoRoute = ManualImpressaoRouteImport.update({
+  id: '/manual-impressao',
+  path: '/manual-impressao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -50,6 +59,11 @@ const FoodServiceRoute = FoodServiceRouteImport.update({
 const EsteticaRoute = EsteticaRouteImport.update({
   id: '/estetica',
   path: '/estetica',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscolherPerfilRoute = EscolherPerfilRouteImport.update({
+  id: '/escolher-perfil',
+  path: '/escolher-perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -81,100 +95,138 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAcompanhamentoRoute =
+  AuthenticatedAcompanhamentoRouteImport.update({
+    id: '/acompanhamento',
+    path: '/acompanhamento',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const ApiPublicCronArchiveRoute = ApiPublicCronArchiveRouteImport.update({
+  id: '/api/public/cron-archive',
+  path: '/api/public/cron-archive',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/escolher-perfil': typeof EscolherPerfilRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/signup': typeof SignupRoute
+  '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/escolher-perfil': typeof EscolherPerfilRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/signup': typeof SignupRoute
+  '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/escolher-perfil': typeof EscolherPerfilRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/incidentes': typeof AuthenticatedIncidentesRoute
+  '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/escolher-perfil'
     | '/estetica'
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual-impressao'
     | '/moda'
     | '/signup'
+    | '/acompanhamento'
     | '/admin'
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/api/public/cron-archive'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/escolher-perfil'
     | '/estetica'
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual-impressao'
     | '/moda'
     | '/signup'
+    | '/acompanhamento'
     | '/admin'
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/api/public/cron-archive'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/escolher-perfil'
     | '/estetica'
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual-impressao'
     | '/moda'
     | '/signup'
+    | '/_authenticated/acompanhamento'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/documentos'
     | '/_authenticated/incidentes'
+    | '/api/public/cron-archive'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  EscolherPerfilRoute: typeof EscolherPerfilRoute
   EsteticaRoute: typeof EsteticaRoute
   FoodServiceRoute: typeof FoodServiceRoute
   HofRoute: typeof HofRoute
   LoginRoute: typeof LoginRoute
+  ManualImpressaoRoute: typeof ManualImpressaoRoute
   ModaRoute: typeof ModaRoute
   SignupRoute: typeof SignupRoute
+  ApiPublicCronArchiveRoute: typeof ApiPublicCronArchiveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -191,6 +243,13 @@ declare module '@tanstack/react-router' {
       path: '/moda'
       fullPath: '/moda'
       preLoaderRoute: typeof ModaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual-impressao': {
+      id: '/manual-impressao'
+      path: '/manual-impressao'
+      fullPath: '/manual-impressao'
+      preLoaderRoute: typeof ManualImpressaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -219,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/estetica'
       fullPath: '/estetica'
       preLoaderRoute: typeof EsteticaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escolher-perfil': {
+      id: '/escolher-perfil'
+      path: '/escolher-perfil'
+      fullPath: '/escolher-perfil'
+      preLoaderRoute: typeof EscolherPerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -263,10 +329,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/acompanhamento': {
+      id: '/_authenticated/acompanhamento'
+      path: '/acompanhamento'
+      fullPath: '/acompanhamento'
+      preLoaderRoute: typeof AuthenticatedAcompanhamentoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/cron-archive': {
+      id: '/api/public/cron-archive'
+      path: '/api/public/cron-archive'
+      fullPath: '/api/public/cron-archive'
+      preLoaderRoute: typeof ApiPublicCronArchiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAcompanhamentoRoute: typeof AuthenticatedAcompanhamentoRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
@@ -274,6 +355,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAcompanhamentoRoute: AuthenticatedAcompanhamentoRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
@@ -287,12 +369,15 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  EscolherPerfilRoute: EscolherPerfilRoute,
   EsteticaRoute: EsteticaRoute,
   FoodServiceRoute: FoodServiceRoute,
   HofRoute: HofRoute,
   LoginRoute: LoginRoute,
+  ManualImpressaoRoute: ManualImpressaoRoute,
   ModaRoute: ModaRoute,
   SignupRoute: SignupRoute,
+  ApiPublicCronArchiveRoute: ApiPublicCronArchiveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
