@@ -1,47 +1,102 @@
 
-## Onde estamos hoje
+## Decisões confirmadas
 
-- Você (`glaubertgia@gmail.com`) já é **super admin**. Pode nomear mentores na seção **Equipe de mentores** dentro de `/admin`.
-- Já existem **4 módulos × 4 semanas = 16 encontros** no banco, mas com títulos genéricos (Fundação Jurídica, Operação Crítica, etc.), sem plano de aula e sem nenhum modelo cadastrado.
-- A página `/documentos` permite ao admin/mentor publicar documentos e vinculá-los a um módulo, mas **mostra tudo para todo mentorado ativo** — não há trava por encontro. O campo `week_id` existe na tabela `documents` mas não é usado pela UI.
-- As semanas hoje só guardam `title` e `is_checkpoint`. Não há campo para “assuntos da aula”, agenda do mentor, leituras, ou checklist de implementação da semana.
+- Pagamento do acompanhamento: **manual** por enquanto (admin libera 30 dias com 1 clique).
+- Ciclo: **30 dias** por pagamento.
+- Saída com PDF: **7 dias de carência** depois do download.
+- PDF: **só os 40 modelos** (capa + sumário + corpo de cada modelo agrupado por encontro).
+- Novidade: ao logar com `glaubertgia@gmail.com`, perguntar se quer entrar como **mentor** ou como **super admin**. Outros mentores vão direto para `/admin`.
 
-## O que falta para atender seu pedido
+## O que vai ser implementado
 
-1. **Reorganizar os 16 encontros conforme o sumário do manual** (6 módulos → 16 encontros).
-2. **Plano de aula por encontro** — campos novos em `weeks`: `summary` (resumo da aula), `agenda` (tópicos guiados que o mentor cobre), `homework` (o que o mentorado implementa na semana).
-3. **Modelos travados por encontro** — `documents.week_id` passa a ser obrigatório para modelos didáticos; o mentorado só enxerga um documento depois que a semana correspondente foi iniciada (status `in_progress`, `submitted` ou `approved`). Documentos sem `week_id` continuam como “biblioteca geral” se você quiser, ou os removemos — sua escolha.
-4. **Painel do super admin para alimentar tudo num só lugar** — nova aba **Encontros & Modelos** em `/admin`, com:
-   - Lista dos 16 encontros agrupados por módulo.
-   - Edição inline do plano de aula (resumo, agenda, tarefa da semana).
-   - Sub-lista de **modelos do encontro** (contratos, termos, notificações, mensagens) com botão **+ Adicionar modelo** já pré-vinculado àquela semana — corpo do documento em texto/markdown, com versão.
-5. **Mentorado vê “Material liberado”** — no card de cada semana no `/dashboard` aparece o número de modelos disponíveis daquele encontro com link para abrir, copiar e colar. Tudo que estiver em encontros futuros fica oculto até liberar.
-6. **Mentor acompanha a turma** — `/admin` já mostra as semanas “submitted” aguardando aprovação; vou adicionar o nome do mentorado e o título do encontro para você conseguir ver de relance “Fulano terminou a Semana 5 — Delivery”.
+### 1. Seletor de papel no login (super admin)
 
-## Mapeamento proposto: 6 módulos do sumário → 16 encontros
+- Após login, se o usuário é admin **e** mentor (caso seu), abre uma tela `/escolher-perfil` com dois botões:
+  - **Entrar como Super Admin** → vai para `/admin` em "modo admin completo" (gerencia mentores, currículo, planos, libera acompanhamento).
+  - **Entrar como Mentor** → vai para `/admin` em "modo mentor" (só vê pendências de aprovação e turma; esconde gestão de mentores e currículo).
+- O modo escolhido fica salvo em `sessionStorage` (`viewAs: 'admin' | 'mentor'`) e tem botão **"Trocar perfil"** no header para alternar sem precisar deslogar.
+- Mentores comuns (sem papel admin) vão direto para `/admin` e nem veem essa tela.
+- Mentorados (cliente) continuam indo para `/dashboard`.
 
+### 2. Conclusão da implementação ("graduado")
+
+- Novos valores no enum `enrollment_status`: `graduated`, `archived`.
+- Função `maybe_graduate_enrollment(_enrollment_id)`: chamada toda vez que uma `week_progress` é aprovada; se as 16 semanas estão `approved`, marca `enrollments.status = 'graduated'`, `completed_at = now()`.
+- Quando o mentorado entra em `/dashboard` e está `graduated` sem ter escolhido próximo passo, abre tela **"Você concluiu a implementação"** com 2 cards:
+  - **Continuar com Acompanhamento** (pré-pago, 30 dias).
+  - **Baixar manual completo e encerrar** (PDF + 7 dias de carência).
+
+### 3. Plano de Acompanhamento (pré-pago manual)
+
+- Novo registro em `plans`: `food_followup`, mensal, R$ a definir (campo já editável).
+- Nova coluna `subscriptions.followup_paid_until timestamptz`.
+- Função `admin_extend_followup(_user_id, _days)` (admin only) — adiciona dias a partir do maior entre `now()` e `followup_paid_until`.
+- Nova rota `/_authenticated/acompanhamento`: ativa quando `followup_paid_until > now()`. Mostra:
+  - Todos os 40 modelos liberados (sem trava por encontro).
+  - Histórico das 16 aulas (read-only).
+  - Canal de dúvidas (reaproveita `incidents` com nova categoria `consultation`).
+  - Contador "Acompanhamento ativo até DD/MM/AAAA".
+- RLS de `documents`: além das regras atuais, libera **todos** os modelos quando `enrollment.status='graduated'` E `followup_paid_until > now()`.
+- Quando expira, a rota mostra "Renovar acompanhamento" e bloqueia o conteúdo (histórico fica preservado).
+
+### 4. Exportação PDF dos 40 modelos
+
+- Server function `POST /api/export-manual` (TanStack server route, edge-compatible) que monta HTML dos modelos e gera PDF via `@react-pdf/renderer` (compatível com Workers).
+- Conteúdo: capa com nome do mentorado e data + sumário dos 16 encontros + corpo de cada modelo agrupado por encontro.
+- Botão disponível em 3 lugares: tela "Próximo passo", `/acompanhamento` (a qualquer momento) e na tela de saída.
+
+### 5. Saída com 7 dias de carência
+
+- Quando o mentorado clica "Baixar manual e encerrar":
+  - Gera o PDF.
+  - Marca `enrollments.status = 'archiving'` e `enrollments.archive_at = now() + interval '7 days'`.
+  - Por 7 dias o acesso continua normal com aviso vermelho "Sua conta será encerrada em DD/MM".
+  - Botão "Cancelar encerramento" reverte para `graduated`.
+  - Após 7 dias (cron diário em `/api/public/cron-archive`), status vira `archived` e o acesso é cortado.
+
+### 6. Re-entrada do mentorado arquivado
+
+- Login normal funciona. Se `status='archived'` e `completed_at IS NOT NULL`, cai em tela **"Bem-vindo de volta, {nome}"**:
+  - Mostra resumo: "Você concluiu a implementação em DD/MM/AAAA".
+  - Único botão: **Reativar acompanhamento (R$ X / 30 dias)**.
+  - Ao confirmar (manual no admin por enquanto), volta para `graduated` + `followup_paid_until = now() + 30 dias`.
+- Admin enxerga essas contas em `/admin` numa nova aba **Ex-mentorados** com botão "Reativar 30 dias".
+
+### 7. Painel admin — novas seções
+
+- Aba **Acompanhamento**: lista mentorados graduados, com `followup_paid_until`, botão "+30 dias", "Ver dúvidas".
+- Aba **Encerramentos**: lista contas em carência (`archiving`) e arquivadas, botão "Reativar".
+- Filtros visíveis só no modo "Super Admin".
+
+## Mudanças técnicas (resumo)
+
+```text
+DB
+├─ enum enrollment_status: + 'graduated', 'archiving', 'archived'
+├─ enrollments: + archive_at timestamptz
+├─ subscriptions: + followup_paid_until timestamptz
+├─ plans: insert food_followup
+├─ incident category: + 'consultation'
+├─ trigger ou função pós-aprovação: maybe_graduate_enrollment
+├─ admin_extend_followup(_user_id, _days)
+├─ admin_request_archive(_user_id) / admin_cancel_archive(_user_id)
+├─ daily_archive_expired() chamada por cron público
+└─ RLS documents: liberação total quando graduated + followup ativo
+
+UI
+├─ /escolher-perfil (novo) — só para usuários admin+mentor
+├─ AppShell: botão "Trocar perfil" + indicador de modo atual
+├─ /dashboard: tela "Próximo passo" quando graduated
+├─ /acompanhamento (novo): área pós-graduação
+├─ /admin: novas abas Acompanhamento / Encerramentos / Ex-mentorados
+└─ Modo "mentor view": esconde gestão de currículo e mentores
+
+Server
+├─ POST /api/export-manual — gera PDF (react-pdf, edge-compatible)
+└─ POST /api/public/cron-archive — arquiva contas com archive_at < now()
+
+Pacotes
+└─ bun add @react-pdf/renderer
 ```
-Módulo 1 — Alicerces (sociedade, marca, patrimônio)        → 2 encontros
-Módulo 2 — Delivery, logística e canal digital             → 3 encontros
-Módulo 3 — Equipe, escala e jornada                        → 3 encontros
-Módulo 4 — Documentos que protegem o caixa                 → 3 encontros
-Módulo 5 — Regras da casa, disciplina e fiscalização       → 3 encontros
-Módulo 6 — Cliente, Procon, reputação e encerramento       → 2 encontros
-                                                  Total → 16 encontros
-```
 
-Cada encontro nasce já com a lista dos **instrumentos do sumário** (Contrato de Motoboy, Recibo de Bag, NDA, Notificação Extrajudicial, etc.) cadastrados como documentos vazios — você só preenche o corpo de cada modelo quando quiser.
-
-## Perguntas rápidas antes de implementar
-
-1. **Confirma a distribuição 2-3-3-3-3-2 acima?** (Posso ajustar para qualquer outra divisão; só precisa somar 16.)
-2. **Documentos sem encontro** (a “biblioteca geral”) — manter como hoje (visíveis para todo mentorado ativo) ou desativar e tudo passa a ser por encontro?
-3. **Quem aprova checkpoint** — só admin, ou qualquer mentor? (Hoje qualquer mentor aprova.)
-
-## Detalhes técnicos (para minha referência)
-
-- Migration: `ALTER TABLE weeks ADD COLUMN summary text, ADD COLUMN agenda text, ADD COLUMN homework text;` + reescrever os 16 títulos/módulos.
-- Migration: política RLS em `documents` adicionando uma cláusula que restringe o `SELECT` do `cliente` a documentos cujo `week_id` esteja entre as semanas com `week_progress.status IN ('in_progress','submitted','approved')` para a `enrollment` daquele usuário. Admin/mentor continuam vendo tudo.
-- Migration: função `admin_seed_food_service_curriculum()` (rodar uma vez) que recria módulos/semanas conforme sumário e insere os instrumentos como `documents` vazios já vinculados ao `week_id` correto.
-- UI: nova rota `/admin` ganha uma seção “Encontros & Modelos” com editor por semana. Página `/documentos` filtra por trava no lado do cliente também (defesa em profundidade).
-- Stripe: nada toca aqui — segue desligado conforme combinado.
+Tudo aprovado — ao iniciar a build vou criar a migration primeiro, depois o seletor de perfil, fluxo de graduação, área de acompanhamento, exportação PDF e cron de arquivamento, nessa ordem.

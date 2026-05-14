@@ -67,9 +67,11 @@ export type Database = {
       }
       enrollments: {
         Row: {
+          archive_at: string | null
           completed_at: string | null
           created_at: string
           id: string
+          next_step_chosen_at: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["enrollment_status"]
           updated_at: string
@@ -77,9 +79,11 @@ export type Database = {
           vertical: string
         }
         Insert: {
+          archive_at?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
+          next_step_chosen_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["enrollment_status"]
           updated_at?: string
@@ -87,9 +91,11 @@ export type Database = {
           vertical?: string
         }
         Update: {
+          archive_at?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
+          next_step_chosen_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["enrollment_status"]
           updated_at?: string
@@ -270,6 +276,7 @@ export type Database = {
         Row: {
           created_at: string
           current_month: number
+          followup_paid_until: string | null
           id: string
           paid_until: string | null
           plan_id: string
@@ -283,6 +290,7 @@ export type Database = {
         Insert: {
           created_at?: string
           current_month?: number
+          followup_paid_until?: string | null
           id?: string
           paid_until?: string | null
           plan_id: string
@@ -296,6 +304,7 @@ export type Database = {
         Update: {
           created_at?: string
           current_month?: number
+          followup_paid_until?: string | null
           id?: string
           paid_until?: string | null
           plan_id?: string
@@ -443,6 +452,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_extend_followup: {
+        Args: { _days?: number; _user_id: string }
+        Returns: string
+      }
       admin_find_user_by_email: {
         Args: { _email: string }
         Returns: {
@@ -463,6 +476,13 @@ export type Database = {
         }[]
       }
       admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
+      cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
+      daily_archive_expired: { Args: never; Returns: number }
+      maybe_graduate_enrollment: {
+        Args: { _enrollment_id: string }
+        Returns: undefined
+      }
+      request_archive: { Args: { _enrollment_id: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "mentor" | "cliente"
@@ -472,6 +492,9 @@ export type Database = {
         | "paused"
         | "completed"
         | "cancelled"
+        | "graduated"
+        | "archiving"
+        | "archived"
       incident_category:
         | "procon"
         | "chargeback"
@@ -479,6 +502,7 @@ export type Database = {
         | "trabalhista"
         | "midia_social"
         | "outros"
+        | "consultation"
       incident_status: "open" | "in_progress" | "resolved" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
@@ -615,6 +639,9 @@ export const Constants = {
         "paused",
         "completed",
         "cancelled",
+        "graduated",
+        "archiving",
+        "archived",
       ],
       incident_category: [
         "procon",
@@ -623,6 +650,7 @@ export const Constants = {
         "trabalhista",
         "midia_social",
         "outros",
+        "consultation",
       ],
       incident_status: ["open", "in_progress", "resolved", "closed"],
       week_status: ["locked", "in_progress", "submitted", "approved"],
