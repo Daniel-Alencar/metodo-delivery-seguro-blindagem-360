@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useViewMode } from "@/hooks/use-view-mode";
 import { CurriculumManager } from "@/components/CurriculumManager";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type EnrollmentRow = { id: string; user_id: string; status: string; vertical: string; created_at: string };
+type EnrollmentRow = { id: string; user_id: string; status: string; vertical: string; created_at: string; archive_at: string | null; completed_at: string | null };
 type ProgressRow = {
   id: string; status: string; submitted_at: string | null; week_id: string;
   enrollment_id: string;
@@ -20,7 +21,9 @@ type Mentor = { user_id: string; email: string; full_name: string; is_admin: boo
 
 function AdminPage() {
   const { isStaff, roles, loading: authLoading } = useAuth();
-  const isAdmin = roles.includes("admin");
+  const { isAdminView, canSwitch } = useViewMode();
+  // Super admin sections only show when in admin view (or user is pure admin without mentor role)
+  const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
