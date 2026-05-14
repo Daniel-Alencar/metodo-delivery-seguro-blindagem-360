@@ -179,6 +179,14 @@ function DashboardPage() {
                           Checkpoint do mês
                         </p>
                       )}
+                      {(prog || unlocked) && docCounts[w.id] > 0 && (
+                        <Link
+                          to="/documentos"
+                          className="mt-2 inline-flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
+                        >
+                          <FileText className="h-3 w-3" /> {docCounts[w.id]} modelo{docCounts[w.id] === 1 ? "" : "s"} liberado{docCounts[w.id] === 1 ? "" : "s"}
+                        </Link>
+                      )}
 
                       <div className="mt-4 text-xs">
                         {!unlocked && !prog && (
