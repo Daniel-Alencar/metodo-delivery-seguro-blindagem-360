@@ -283,6 +283,20 @@ function AdminPage() {
             )}
           </div>
         </section>
+      {isAdmin && (
+        <section>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-2xl font-semibold tracking-tight">Encontros & Modelos</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Edite o plano de aula de cada um dos 16 encontros e cadastre os modelos (contratos, termos, recibos, notificações).
+            Cada modelo é liberado para o mentorado somente quando o encontro correspondente é iniciado.
+          </p>
+          <div className="mt-6">
+            <CurriculumManager />
+          </div>
+        </section>
       )}
     </div>
   );
