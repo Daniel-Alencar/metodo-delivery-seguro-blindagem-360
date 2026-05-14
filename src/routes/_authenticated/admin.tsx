@@ -478,3 +478,138 @@ function AuditLogPanel() {
   );
 }
 
+
+type MonthlyRow = {
+  mentor_id: string;
+  mentor_name: string;
+  mentor_email: string;
+  is_admin: boolean;
+  classes_attended: number;
+  weeks_approved: number;
+  weeks_released: number;
+  followups_extended: number;
+  distinct_students: number;
+  total_actions: number;
+};
+
+function MonthlyReportPanel() {
+  const now = new Date();
+  const defaultMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const [month, setMonth] = useState(defaultMonth);
+  const [rows, setRows] = useState<MonthlyRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase.rpc("admin_mentor_monthly_report", {
+      _month: `${month}-01`,
+    });
+    setRows((data ?? []) as MonthlyRow[]);
+    setLoading(false);
+  }
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [month]);
+
+  function exportCsv() {
+    const header = ["Mentor", "E-mail", "Aulas", "Aprovacoes", "Liberacoes", "Acompanhamento", "Mentorados", "Total"];
+    const lines = rows.map(r => [
+      r.mentor_name || "", r.mentor_email,
+      r.classes_attended, r.weeks_approved, r.weeks_released,
+      r.followups_extended, r.distinct_students, r.total_actions,
+    ].join(","));
+    const csv = [header.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `relatorio-mentores-${month}.csv`;
+    a.click();
+  }
+
+  const totals = rows.reduce((acc, r) => ({
+    classes: acc.classes + Number(r.classes_attended),
+    approvals: acc.approvals + Number(r.weeks_approved),
+    releases: acc.releases + Number(r.weeks_released),
+    followups: acc.followups + Number(r.followups_extended),
+  }), { classes: 0, approvals: 0, releases: 0, followups: 0 });
+
+  return (
+    <section>
+      <div className="flex items-center gap-2">
+        <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        <h2 className="text-2xl font-semibold tracking-tight">Relatório mensal por mentor</h2>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Aulas conduzidas, aprovações, liberações de semana e de acompanhamento por mentor no mês selecionado.
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <input
+          type="month" value={month} onChange={(e) => setMonth(e.target.value)}
+          className="rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-foreground/40"
+        />
+        <button onClick={exportCsv} className="rounded-full border border-border px-3 py-1.5 text-xs">
+          Exportar CSV
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        {[
+          { label: "Aulas conduzidas", value: totals.classes },
+          { label: "Aprovações", value: totals.approvals },
+          { label: "Liberações de semana", value: totals.releases },
+          { label: "Acompanhamento (+30d)", value: totals.followups },
+        ].map((k) => (
+          <div key={k.label} className="rounded-xl border border-border bg-card/40 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">{k.label}</p>
+            <p className="mt-1 text-2xl font-semibold">{k.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {loading ? (
+        <p className="mt-6 text-sm text-muted-foreground">Carregando...</p>
+      ) : rows.length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">Nenhum mentor cadastrado.</p>
+      ) : (
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 text-left">Mentor</th>
+                <th className="px-4 py-3 text-right">Aulas</th>
+                <th className="px-4 py-3 text-right">Aprovações</th>
+                <th className="px-4 py-3 text-right">Liberações</th>
+                <th className="px-4 py-3 text-right">Acomp.</th>
+                <th className="px-4 py-3 text-right">Mentorados</th>
+                <th className="px-4 py-3 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.mentor_id} className="border-t border-border bg-card/30">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {r.mentor_name || "—"}
+                      {r.is_admin && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-300">
+                          <Crown className="h-3 w-3" /> Admin
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{r.mentor_email}</div>
+                  </td>
+                  <td className="px-4 py-3 text-right">{r.classes_attended}</td>
+                  <td className="px-4 py-3 text-right">{r.weeks_approved}</td>
+                  <td className="px-4 py-3 text-right">{r.weeks_released}</td>
+                  <td className="px-4 py-3 text-right">{r.followups_extended}</td>
+                  <td className="px-4 py-3 text-right">{r.distinct_students}</td>
+                  <td className="px-4 py-3 text-right font-semibold">{r.total_actions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
