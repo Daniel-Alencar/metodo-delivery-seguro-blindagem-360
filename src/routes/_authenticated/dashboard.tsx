@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Lock, Loader2, Send, Calendar } from "lucide-react";
+import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -28,18 +28,25 @@ function DashboardPage() {
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [progress, setProgress] = useState<Progress[]>([]);
+  const [docCounts, setDocCounts] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    const [{ data: m }, { data: w }, { data: e }] = await Promise.all([
+    const [{ data: m }, { data: w }, { data: e }, { data: docs }] = await Promise.all([
       supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
       supabase.from("weeks").select("*").order("week_index"),
       supabase.from("enrollments").select("*").eq("user_id", user!.id).eq("vertical", "food-service").maybeSingle(),
+      supabase.from("documents").select("week_id").not("week_id", "is", null),
     ]);
     setModules(m ?? []);
     setWeeks(w ?? []);
     setEnrollment(e as Enrollment | null);
+    const counts: Record<string, number> = {};
+    (docs ?? []).forEach((d: { week_id: string | null }) => {
+      if (d.week_id) counts[d.week_id] = (counts[d.week_id] ?? 0) + 1;
+    });
+    setDocCounts(counts);
     if (e) {
       const { data: p } = await supabase.from("week_progress").select("*").eq("enrollment_id", e.id);
       setProgress((p ?? []) as Progress[]);
@@ -171,6 +178,14 @@ function DashboardPage() {
                         <p className="mt-1 text-[11px] uppercase tracking-wider text-amber-300">
                           Checkpoint do mês
                         </p>
+                      )}
+                      {(prog || unlocked) && docCounts[w.id] > 0 && (
+                        <Link
+                          to="/documentos"
+                          className="mt-2 inline-flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
+                        >
+                          <FileText className="h-3 w-3" /> {docCounts[w.id]} modelo{docCounts[w.id] === 1 ? "" : "s"} liberado{docCounts[w.id] === 1 ? "" : "s"}
+                        </Link>
                       )}
 
                       <div className="mt-4 text-xs">
