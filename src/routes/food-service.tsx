@@ -37,21 +37,45 @@ const journey = [
     month: "Mês 1",
     title: "Fundação Jurídica",
     desc: "Base societária, ativos e estrutura formal de proteção.",
+    weeks: [
+      "Semana 1 — Diagnóstico societário e mapeamento de ativos",
+      "Semana 2 — Estrutura jurídica e separação patrimonial",
+      "Semana 3 — Documentos fundadores e governança inicial",
+      "Semana 4 — Validação da fundação + checkpoint com mentor",
+    ],
   },
   {
     month: "Mês 2",
     title: "Operação Crítica",
     desc: "Delivery, contratos, logística e primeiros documentos operacionais.",
+    weeks: [
+      "Semana 1 — Contratos com motoboys e parceiros logísticos",
+      "Semana 2 — Termos de marketplace e plataformas de delivery",
+      "Semana 3 — Protocolos de expedição, lacre e rastreabilidade",
+      "Semana 4 — Auditoria operacional + checkpoint com mentor",
+    ],
   },
   {
     month: "Mês 3",
     title: "Equipe & Prova Interna",
     desc: "Jornada, benefícios, sigilo, treinamento e disciplina.",
+    weeks: [
+      "Semana 1 — Jornada, ponto e política de benefícios",
+      "Semana 2 — Acordos de sigilo, código de conduta e disciplina",
+      "Semana 3 — Treinamento operacional e trilhas de evidência",
+      "Semana 4 — Simulação de incidente interno + checkpoint",
+    ],
   },
   {
     month: "Mês 4",
     title: "Defesa Externa",
     desc: "Consumo, notificações, fiscalização e consolidação da blindagem.",
+    weeks: [
+      "Semana 1 — Atendimento ao consumidor e Procon",
+      "Semana 2 — Resposta a notificações e órgãos fiscalizadores",
+      "Semana 3 — Crise digital, redes sociais e reputação",
+      "Semana 4 — Certificação Delivery Seguro + plano de monitoramento",
+    ],
   },
 ];
 
@@ -161,12 +185,16 @@ function FoodServicePage() {
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Jornada Guiada</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-              Implantação em 4 meses, com dupla trava: tempo + aprovação.
+              Implantação premium em 4 meses + monitoramento.
             </h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+              Cada mês é dividido em 4 encontros semanais — um por semana — com entregas, evidências
+              e checkpoint de aprovação no final.
+            </p>
           </div>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           {journey.map((m, i) => (
             <div
               key={m.month}
@@ -185,7 +213,17 @@ function FoodServicePage() {
                 <h3 className="text-lg font-semibold tracking-tight">{m.title}</h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.desc}</p>
-              <div className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground">
+
+              <ul className="mt-5 space-y-2 border-t border-border/60 pt-4">
+                {m.weeks.map((w) => (
+                  <li key={w} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/80" />
+                    <span>{w}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5 inline-flex items-center gap-2 text-xs text-muted-foreground">
                 {i === 0 ? (
                   <>
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> Liberado no início
