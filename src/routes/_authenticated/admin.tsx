@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,11 +15,24 @@ type ProgressRow = {
   enrollment_id: string;
 };
 
+type Mentor = { user_id: string; email: string; full_name: string; is_admin: boolean; granted_at: string };
+
 function AdminPage() {
-  const { isStaff, loading: authLoading } = useAuth();
+  const { isStaff, roles, loading: authLoading } = useAuth();
+  const isAdmin = roles.includes("admin");
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
+  const [searchMsg, setSearchMsg] = useState<string | null>(null);
+  const [teamBusy, setTeamBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  async function loadMentors() {
+    const { data } = await supabase.rpc("admin_list_mentors");
+    setMentors((data ?? []) as Mentor[]);
+  }
 
   async function load() {
     setLoading(true);
@@ -29,10 +42,41 @@ function AdminPage() {
     ]);
     setEnrollments((e ?? []) as EnrollmentRow[]);
     setPending((p ?? []) as ProgressRow[]);
+    if (isAdmin) await loadMentors();
     setLoading(false);
   }
 
-  useEffect(() => { if (isStaff) load(); }, [isStaff]);
+  useEffect(() => { if (isStaff) load(); /* eslint-disable-next-line */ }, [isStaff, isAdmin]);
+
+  async function findUser() {
+    setSearchMsg(null);
+    setSearchResult(null);
+    if (!searchEmail.trim()) return;
+    const { data, error } = await supabase.rpc("admin_find_user_by_email", { _email: searchEmail.trim() });
+    if (error) { setSearchMsg(error.message); return; }
+    const row = (data ?? [])[0];
+    if (!row) { setSearchMsg("Nenhum usuário encontrado com esse e-mail."); return; }
+    setSearchResult(row);
+  }
+
+  async function grantMentor(userId: string) {
+    setTeamBusy(true);
+    const { error } = await supabase.rpc("admin_grant_mentor", { _user_id: userId });
+    if (error) setSearchMsg(error.message);
+    setSearchResult(null);
+    setSearchEmail("");
+    await loadMentors();
+    setTeamBusy(false);
+  }
+
+  async function revokeMentor(userId: string) {
+    if (!confirm("Remover o papel de mentor deste usuário?")) return;
+    setTeamBusy(true);
+    const { error } = await supabase.rpc("admin_revoke_mentor", { _user_id: userId });
+    if (error) alert(error.message);
+    await loadMentors();
+    setTeamBusy(false);
+  }
 
   async function activate(id: string) {
     await supabase.from("enrollments").update({
