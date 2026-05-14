@@ -28,18 +28,25 @@ function DashboardPage() {
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [progress, setProgress] = useState<Progress[]>([]);
+  const [docCounts, setDocCounts] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    const [{ data: m }, { data: w }, { data: e }] = await Promise.all([
+    const [{ data: m }, { data: w }, { data: e }, { data: docs }] = await Promise.all([
       supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
       supabase.from("weeks").select("*").order("week_index"),
       supabase.from("enrollments").select("*").eq("user_id", user!.id).eq("vertical", "food-service").maybeSingle(),
+      supabase.from("documents").select("week_id").not("week_id", "is", null),
     ]);
     setModules(m ?? []);
     setWeeks(w ?? []);
     setEnrollment(e as Enrollment | null);
+    const counts: Record<string, number> = {};
+    (docs ?? []).forEach((d: { week_id: string | null }) => {
+      if (d.week_id) counts[d.week_id] = (counts[d.week_id] ?? 0) + 1;
+    });
+    setDocCounts(counts);
     if (e) {
       const { data: p } = await supabase.from("week_progress").select("*").eq("enrollment_id", e.id);
       setProgress((p ?? []) as Progress[]);
