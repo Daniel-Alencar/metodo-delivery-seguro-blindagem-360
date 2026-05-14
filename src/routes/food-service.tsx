@@ -142,19 +142,19 @@ function FoodServicePage() {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
+          <Link
+            to="/signup"
             className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
           >
             Ativar minha blindagem
             <ShieldCheck className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
+          </Link>
+          <Link
+            to="/login"
             className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card backdrop-blur"
           >
-            Conhecer o método
-          </button>
+            Já sou cliente · Entrar
+          </Link>
         </div>
       </section>
 
