@@ -11,25 +11,38 @@ export const Route = createFileRoute("/signup")({
 function SignupPage() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
+  const [cpf, setCpf] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptLgpd, setAcceptLgpd] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setInfo(null);
+    if (!acceptTerms || !acceptLgpd) {
+      setError("Você precisa ler e aceitar os Termos de Uso e a Política LGPD.");
+      return;
+    }
+    const cpfDigits = cpf.replace(/\D/g, "");
+    if (cpfDigits.length !== 11) {
+      setError("Informe um CPF válido (11 dígitos).");
+      return;
+    }
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { full_name: fullName, company_name: companyName, phone },
+        data: { full_name: fullName, company_name: companyName, phone, cpf: cpfDigits },
       },
     });
     if (error) {
@@ -37,8 +50,16 @@ function SignupPage() {
       setLoading(false);
       return;
     }
+    const userId = data.user?.id;
+    if (userId) {
+      await supabase.from("profiles").update({
+        cpf: cpfDigits,
+        accepted_terms_at: new Date().toISOString(),
+        accepted_lgpd_at: new Date().toISOString(),
+        marketing_consent: marketingConsent,
+      }).eq("id", userId);
+    }
     if (data.session) {
-      // create pending enrollment
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
         vertical: "food-service",
@@ -71,10 +92,33 @@ function SignupPage() {
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           <Field label="Nome completo" value={fullName} onChange={setFullName} required />
+          <Field label="CPF (apenas números)" value={cpf} onChange={setCpf} required />
           <Field label="Empresa / razão social" value={companyName} onChange={setCompanyName} />
           <Field label="Telefone (WhatsApp)" value={phone} onChange={setPhone} />
           <Field label="E-mail" type="email" value={email} onChange={setEmail} required />
           <Field label="Senha (mín. 6 caracteres)" type="password" value={password} onChange={setPassword} required />
+
+          <div className="space-y-3 rounded-md border border-border bg-card/40 p-4 text-xs">
+            <Checkbox checked={acceptTerms} onChange={setAcceptTerms}>
+              Li e concordo com os{" "}
+              <Link to="/termos" target="_blank" className="text-foreground underline">
+                Termos de Uso
+              </Link>
+              .
+            </Checkbox>
+            <Checkbox checked={acceptLgpd} onChange={setAcceptLgpd}>
+              Li e concordo com a{" "}
+              <Link to="/privacidade" target="_blank" className="text-foreground underline">
+                Política de Privacidade (LGPD)
+              </Link>
+              .
+            </Checkbox>
+            <Checkbox checked={marketingConsent} onChange={setMarketingConsent}>
+              Autorizo receber comunicações de <b>publicidade e promoções exclusivamente do próprio sistema</b>{" "}
+              Blindagem 360º (opcional, revogável a qualquer momento).
+            </Checkbox>
+          </div>
+
           {error && <p className="text-sm text-red-300">{error}</p>}
           {info && <p className="text-sm text-emerald-300">{info}</p>}
           <button
@@ -104,5 +148,19 @@ function Field({
         className="mt-1 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-foreground/40"
       />
     </div>
+  );
+}
+
+function Checkbox({
+  checked, onChange, children,
+}: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
+  return (
+    <label className="flex cursor-pointer items-start gap-2 leading-relaxed text-muted-foreground">
+      <input
+        type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-background"
+      />
+      <span>{children}</span>
+    </label>
   );
 }

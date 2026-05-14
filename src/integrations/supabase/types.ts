@@ -256,26 +256,38 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accepted_lgpd_at: string | null
+          accepted_terms_at: string | null
           company_name: string | null
+          cpf: string | null
           created_at: string
           full_name: string | null
           id: string
+          marketing_consent: boolean
           phone: string | null
           updated_at: string
         }
         Insert: {
+          accepted_lgpd_at?: string | null
+          accepted_terms_at?: string | null
           company_name?: string | null
+          cpf?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          marketing_consent?: boolean
           phone?: string | null
           updated_at?: string
         }
         Update: {
+          accepted_lgpd_at?: string | null
+          accepted_terms_at?: string | null
           company_name?: string | null
+          cpf?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          marketing_consent?: boolean
           phone?: string | null
           updated_at?: string
         }
