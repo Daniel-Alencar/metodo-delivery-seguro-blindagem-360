@@ -143,6 +143,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_audit_log: {
+        Row: {
+          action: Database["public"]["Enums"]["mentor_action"]
+          created_at: string
+          enrollment_id: string | null
+          id: string
+          mentor_id: string
+          metadata: Json | null
+          notes: string | null
+          student_id: string | null
+          week_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["mentor_action"]
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          mentor_id: string
+          metadata?: Json | null
+          notes?: string | null
+          student_id?: string | null
+          week_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["mentor_action"]
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          mentor_id?: string
+          metadata?: Json | null
+          notes?: string | null
+          student_id?: string | null
+          week_id?: string | null
+        }
+        Relationships: []
+      }
       modules: {
         Row: {
           created_at: string
@@ -452,6 +488,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_audit_list: {
+        Args: {
+          _action?: Database["public"]["Enums"]["mentor_action"]
+          _limit?: number
+          _mentor?: string
+          _student?: string
+        }
+        Returns: {
+          action: Database["public"]["Enums"]["mentor_action"]
+          created_at: string
+          id: string
+          mentor_email: string
+          mentor_id: string
+          mentor_name: string
+          metadata: Json
+          notes: string
+          student_email: string
+          student_id: string
+          student_name: string
+          week_index: number
+          week_title: string
+        }[]
+      }
       admin_extend_followup: {
         Args: { _days?: number; _user_id: string }
         Returns: string
@@ -478,6 +537,10 @@ export type Database = {
       admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
       cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
       daily_archive_expired: { Args: never; Returns: number }
+      log_class_attendance: {
+        Args: { _enrollment_id: string; _notes?: string; _week_id: string }
+        Returns: string
+      }
       maybe_graduate_enrollment: {
         Args: { _enrollment_id: string }
         Returns: undefined
@@ -504,6 +567,15 @@ export type Database = {
         | "outros"
         | "consultation"
       incident_status: "open" | "in_progress" | "resolved" | "closed"
+      mentor_action:
+        | "week_released"
+        | "week_approved"
+        | "class_attended"
+        | "followup_extended"
+        | "mentor_granted"
+        | "mentor_revoked"
+        | "archive_requested"
+        | "archive_cancelled"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
     CompositeTypes: {
@@ -653,6 +725,16 @@ export const Constants = {
         "consultation",
       ],
       incident_status: ["open", "in_progress", "resolved", "closed"],
+      mentor_action: [
+        "week_released",
+        "week_approved",
+        "class_attended",
+        "followup_extended",
+        "mentor_granted",
+        "mentor_revoked",
+        "archive_requested",
+        "archive_cancelled",
+      ],
       week_status: ["locked", "in_progress", "submitted", "approved"],
     },
   },

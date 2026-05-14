@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
@@ -99,6 +99,14 @@ function AdminPage() {
     }).eq("id", id);
     await load();
   }
+  async function logAttendance(p: ProgressRow) {
+    const notes = prompt("Notas da aula (opcional):") ?? "";
+    const { error } = await supabase.rpc("log_class_attendance", {
+      _enrollment_id: p.enrollment_id, _week_id: p.week_id, _notes: notes || undefined,
+    });
+    if (error) alert(error.message);
+    else alert("Atendimento registrado.");
+  }
 
   if (authLoading) return <div className="flex items-center text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   if (!isStaff) {
@@ -182,11 +190,19 @@ function AdminPage() {
                 >
                   Aprovar checkpoint
                 </button>
+                <button
+                  onClick={() => logAttendance(p)}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border py-2 text-xs"
+                >
+                  <ClipboardCheck className="h-3.5 w-3.5" /> Registrar atendimento de aula
+                </button>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      <AuditLogPanel />
 
       {isAdmin && (
         <section>
@@ -352,3 +368,111 @@ function FollowupPanel() {
     </section>
   );
 }
+
+type AuditRow = {
+  id: string; created_at: string; action: string;
+  mentor_id: string; mentor_name: string; mentor_email: string;
+  student_id: string | null; student_name: string | null; student_email: string | null;
+  week_index: number | null; week_title: string | null;
+  notes: string | null;
+};
+
+const ACTION_LABEL: Record<string, string> = {
+  week_released: "Liberou semana",
+  week_approved: "Aprovou semana",
+  class_attended: "Conduziu aula",
+  followup_extended: "Liberou acompanhamento",
+  mentor_granted: "Promoveu mentor",
+  mentor_revoked: "Removeu mentor",
+  archive_requested: "Solicitou arquivamento",
+  archive_cancelled: "Cancelou arquivamento",
+};
+
+function AuditLogPanel() {
+  const [rows, setRows] = useState<AuditRow[]>([]);
+  const [filter, setFilter] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase.rpc("admin_audit_list", {
+      _limit: 200,
+      _action: (filter || null) as never,
+    });
+    setRows((data ?? []) as AuditRow[]);
+    setLoading(false);
+  }
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [filter]);
+
+  return (
+    <section>
+      <div className="flex items-center gap-2">
+        <History className="h-4 w-4 text-muted-foreground" />
+        <h2 className="text-2xl font-semibold tracking-tight">Histórico de ações</h2>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Registro de tudo que cada mentor fez: liberações de semana, aprovações, aulas conduzidas e liberações de acompanhamento.
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button onClick={() => setFilter("")} className={`rounded-full border px-3 py-1 text-xs ${!filter ? "bg-foreground text-background" : "border-border"}`}>Todas</button>
+        {Object.entries(ACTION_LABEL).map(([k, v]) => (
+          <button key={k} onClick={() => setFilter(k)} className={`rounded-full border px-3 py-1 text-xs ${filter === k ? "bg-foreground text-background" : "border-border"}`}>{v}</button>
+        ))}
+      </div>
+
+      {loading ? (
+        <p className="mt-6 text-sm text-muted-foreground">Carregando...</p>
+      ) : rows.length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">Nenhum registro.</p>
+      ) : (
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 text-left">Quando</th>
+                <th className="px-4 py-3 text-left">Mentor</th>
+                <th className="px-4 py-3 text-left">Ação</th>
+                <th className="px-4 py-3 text-left">Mentorado</th>
+                <th className="px-4 py-3 text-left">Encontro</th>
+                <th className="px-4 py-3 text-left">Observação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} className="border-t border-border bg-card/30 align-top">
+                  <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(r.created_at).toLocaleString("pt-BR")}
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <div>{r.mentor_name || "—"}</div>
+                    <div className="text-muted-foreground">{r.mentor_email}</div>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <span className="rounded-full border border-border px-2 py-0.5">
+                      {ACTION_LABEL[r.action] ?? r.action}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    {r.student_email ? (
+                      <>
+                        <div>{r.student_name || "—"}</div>
+                        <div className="text-muted-foreground">{r.student_email}</div>
+                      </>
+                    ) : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    {r.week_index ? `#${r.week_index} ${r.week_title ?? ""}` : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground max-w-[260px]">{r.notes ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
