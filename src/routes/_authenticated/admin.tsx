@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { CurriculumManager } from "@/components/CurriculumManager";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Painel Mentor — Blindagem 360º" }] }),
