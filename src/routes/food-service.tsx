@@ -185,12 +185,16 @@ function FoodServicePage() {
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Jornada Guiada</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-              Implantação em 4 meses, com dupla trava: tempo + aprovação.
+              Implantação premium em 4 meses + monitoramento.
             </h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+              Cada mês é dividido em 4 encontros semanais — um por semana — com entregas, evidências
+              e checkpoint de aprovação no final.
+            </p>
           </div>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           {journey.map((m, i) => (
             <div
               key={m.month}
@@ -209,7 +213,17 @@ function FoodServicePage() {
                 <h3 className="text-lg font-semibold tracking-tight">{m.title}</h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.desc}</p>
-              <div className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground">
+
+              <ul className="mt-5 space-y-2 border-t border-border/60 pt-4">
+                {m.weeks.map((w) => (
+                  <li key={w} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/80" />
+                    <span>{w}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5 inline-flex items-center gap-2 text-xs text-muted-foreground">
                 {i === 0 ? (
                   <>
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> Liberado no início
