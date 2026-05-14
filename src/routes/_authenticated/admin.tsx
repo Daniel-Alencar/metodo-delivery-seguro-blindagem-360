@@ -283,6 +283,8 @@ function AdminPage() {
             )}
           </div>
         </section>
+      )}
+
       {isAdmin && (
         <section>
           <div className="flex items-center gap-2">
