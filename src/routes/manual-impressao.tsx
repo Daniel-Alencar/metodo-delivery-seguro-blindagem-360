@@ -68,7 +68,7 @@ function ManualPage() {
           size: A4;
           margin: 18mm 14mm 24mm 14mm;
           @bottom-center {
-            content: "Documento de uso EXCLUSIVO de ${`"+name.replace(/"/g,'\\"')+"`} (CPF ${`"+watermark+"`}). Proibida a reprodução. Sob pena de responsabilização civil e criminal.";
+            content: "Uso EXCLUSIVO de ${name.replace(/"/g, "")} — CPF ${watermark} — Proibida a reprodução (responsabilização civil e criminal)";
             font-size: 8pt;
             color: #888;
           }
