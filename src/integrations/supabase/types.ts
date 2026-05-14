@@ -393,29 +393,38 @@ export type Database = {
       }
       weeks: {
         Row: {
+          agenda: string | null
           created_at: string
           description: string | null
+          homework: string | null
           id: string
           is_checkpoint: boolean
           module_id: string
+          summary: string | null
           title: string
           week_index: number
         }
         Insert: {
+          agenda?: string | null
           created_at?: string
           description?: string | null
+          homework?: string | null
           id?: string
           is_checkpoint?: boolean
           module_id: string
+          summary?: string | null
           title: string
           week_index: number
         }
         Update: {
+          agenda?: string | null
           created_at?: string
           description?: string | null
+          homework?: string | null
           id?: string
           is_checkpoint?: boolean
           module_id?: string
+          summary?: string | null
           title?: string
           week_index?: number
         }
