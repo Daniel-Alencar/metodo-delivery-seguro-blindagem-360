@@ -164,6 +164,54 @@ export type Database = {
         }
         Relationships: []
       }
+      plans: {
+        Row: {
+          active: boolean
+          amount_cents: number
+          billing_interval: string
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          discount_percent: number
+          id: string
+          name: string
+          stripe_price_id: string | null
+          updated_at: string
+          vertical: string
+        }
+        Insert: {
+          active?: boolean
+          amount_cents: number
+          billing_interval: string
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          name: string
+          stripe_price_id?: string | null
+          updated_at?: string
+          vertical?: string
+        }
+        Update: {
+          active?: boolean
+          amount_cents?: number
+          billing_interval?: string
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          name?: string
+          stripe_price_id?: string | null
+          updated_at?: string
+          vertical?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -217,6 +265,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_month: number
+          id: string
+          paid_until: string | null
+          plan_id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_month?: number
+          id?: string
+          paid_until?: string | null
+          plan_id: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_month?: number
+          id?: string
+          paid_until?: string | null
+          plan_id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
