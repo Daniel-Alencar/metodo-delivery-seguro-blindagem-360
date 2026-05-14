@@ -43,7 +43,10 @@ function IncidentesPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     await supabase.from("incidents").insert({
-      user_id: user.id, category: form.category, title: form.title, description: form.description,
+      user_id: user.id,
+      category: form.category as "procon" | "chargeback" | "sanitaria" | "trabalhista" | "midia_social" | "outros",
+      title: form.title,
+      description: form.description,
     });
     setForm({ category: "procon", title: "", description: "" });
     setAdding(false);
@@ -51,7 +54,7 @@ function IncidentesPage() {
   }
 
   async function setStatus(id: string, status: string) {
-    await supabase.from("incidents").update({ status }).eq("id", id);
+    await supabase.from("incidents").update({ status: status as "open" | "in_progress" | "resolved" | "closed" }).eq("id", id);
     await load();
   }
 

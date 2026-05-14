@@ -185,16 +185,9 @@ function VerticalCard({ vertical }: { vertical: Vertical }) {
     </div>
   );
 
-  if (vertical.status === "available") {
-    return (
-      <Link to={vertical.to} className="block h-full">
-        {inner}
-      </Link>
-    );
-  }
   return (
-    <div className="block h-full cursor-not-allowed opacity-90" aria-disabled>
+    <Link to={vertical.to} className="block h-full">
       {inner}
-    </div>
+    </Link>
   );
 }
