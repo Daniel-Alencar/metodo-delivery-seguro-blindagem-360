@@ -14,16 +14,353 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          body: string | null
+          created_at: string
+          description: string | null
+          id: string
+          module_id: string | null
+          title: string
+          updated_at: string
+          version: string
+          week_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_id?: string | null
+          title: string
+          updated_at?: string
+          version?: string
+          week_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_id?: string | null
+          title?: string
+          updated_at?: string
+          version?: string
+          week_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_week_id_fkey"
+            columns: ["week_id"]
+            isOneToOne: false
+            referencedRelation: "weeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enrollments: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["enrollment_status"]
+          updated_at: string
+          user_id: string
+          vertical: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          updated_at?: string
+          user_id: string
+          vertical?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          updated_at?: string
+          user_id?: string
+          vertical?: string
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          assigned_to: string | null
+          category: Database["public"]["Enums"]["incident_category"]
+          created_at: string
+          description: string
+          id: string
+          resolution: string | null
+          status: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category: Database["public"]["Enums"]["incident_category"]
+          created_at?: string
+          description: string
+          id?: string
+          resolution?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["incident_category"]
+          created_at?: string
+          description?: string
+          id?: string
+          resolution?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          month_index: number
+          title: string
+          vertical: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          month_index: number
+          title: string
+          vertical?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          month_index?: number
+          title?: string
+          vertical?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      strategic_messages: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      week_progress: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          enrollment_id: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["week_status"]
+          submitted_at: string | null
+          updated_at: string
+          week_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          enrollment_id: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["week_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          week_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          enrollment_id?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["week_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          week_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "week_progress_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "week_progress_week_id_fkey"
+            columns: ["week_id"]
+            isOneToOne: false
+            referencedRelation: "weeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weeks: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_checkpoint: boolean
+          module_id: string
+          title: string
+          week_index: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_checkpoint?: boolean
+          module_id: string
+          title: string
+          week_index: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_checkpoint?: boolean
+          module_id?: string
+          title?: string
+          week_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weeks_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "mentor" | "cliente"
+      enrollment_status:
+        | "pending"
+        | "active"
+        | "paused"
+        | "completed"
+        | "cancelled"
+      incident_category:
+        | "procon"
+        | "chargeback"
+        | "sanitaria"
+        | "trabalhista"
+        | "midia_social"
+        | "outros"
+      incident_status: "open" | "in_progress" | "resolved" | "closed"
+      week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +487,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "mentor", "cliente"],
+      enrollment_status: [
+        "pending",
+        "active",
+        "paused",
+        "completed",
+        "cancelled",
+      ],
+      incident_category: [
+        "procon",
+        "chargeback",
+        "sanitaria",
+        "trabalhista",
+        "midia_social",
+        "outros",
+      ],
+      incident_status: ["open", "in_progress", "resolved", "closed"],
+      week_status: ["locked", "in_progress", "submitted", "approved"],
+    },
   },
 } as const
