@@ -108,11 +108,65 @@ function DashboardPage() {
     setBusy(null);
   }
 
+  const navigate = useNavigate();
+
+  async function chooseArchive() {
+    if (!enrollment) return;
+    if (!confirm("Confirma encerrar sua conta? Você terá 7 dias de carência para baixar o manual e revisar antes do bloqueio.")) return;
+    await supabase.rpc("request_archive", { _enrollment_id: enrollment.id });
+    await load();
+  }
+
+  async function chooseFollowup() {
+    if (!enrollment) return;
+    await supabase.from("enrollments").update({ next_step_chosen_at: new Date().toISOString() }).eq("id", enrollment.id);
+    navigate({ to: "/acompanhamento" });
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando trilha...</div>;
   }
 
-  if (!enrollment || enrollment.status !== "active") {
+  // Graduated and hasn't picked next step → "Próximo passo" screen
+  if (enrollment && enrollment.status === "graduated" && !enrollment.next_step_chosen_at) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/5 p-6 text-center">
+          <GraduationCap className="mx-auto h-10 w-10 text-emerald-300" />
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight">Você concluiu a implementação!</h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+            Os 16 encontros foram aprovados. Agora escolha como deseja continuar.
+          </p>
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <button
+            onClick={chooseFollowup}
+            className="group rounded-2xl border border-border bg-card/60 p-6 text-left transition-all hover:-translate-y-0.5 hover:border-cyan-500/40"
+          >
+            <HeartPulse className="h-6 w-6 text-cyan-300" />
+            <h2 className="mt-4 text-lg font-semibold">Continuar com Acompanhamento</h2>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Plano pré-pago de 30 dias. Acesso a todos os 40 modelos, histórico das aulas e canal direto
+              com a mentoria para dúvidas e consultas do dia a dia.
+            </p>
+          </button>
+          <button
+            onClick={chooseArchive}
+            className="group rounded-2xl border border-border bg-card/60 p-6 text-left transition-all hover:-translate-y-0.5 hover:border-red-500/40"
+          >
+            <Download className="h-6 w-6 text-red-300" />
+            <h2 className="mt-4 text-lg font-semibold">Baixar manual e encerrar</h2>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Você baixa o PDF com os 40 modelos, fica 7 dias com acesso para revisar e depois sua conta é arquivada.
+              Pode reativar o Acompanhamento a qualquer momento depois.
+            </p>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) {
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-10 text-center">
         <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
@@ -127,6 +181,24 @@ function DashboardPage() {
       </div>
     );
   }
+
+  const archivingBanner = enrollment.status === "archiving" && enrollment.archive_at ? (
+    <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-500/40 bg-red-500/5 p-4 text-sm">
+      <AlertTriangle className="h-5 w-5 text-red-300" />
+      <div className="flex-1">
+        <p className="font-medium text-red-200">Encerramento agendado</p>
+        <p className="text-xs text-red-200/80">
+          Sua conta será arquivada em {new Date(enrollment.archive_at).toLocaleDateString("pt-BR")}.
+        </p>
+      </div>
+      <button
+        onClick={async () => { await supabase.rpc("cancel_archive", { _enrollment_id: enrollment.id }); await load(); }}
+        className="rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-xs hover:bg-red-500/20"
+      >
+        Cancelar encerramento
+      </button>
+    </div>
+  ) : null;
 
   return (
     <div>
