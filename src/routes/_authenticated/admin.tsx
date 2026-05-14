@@ -190,11 +190,19 @@ function AdminPage() {
                 >
                   Aprovar checkpoint
                 </button>
+                <button
+                  onClick={() => logAttendance(p)}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border py-2 text-xs"
+                >
+                  <ClipboardCheck className="h-3.5 w-3.5" /> Registrar atendimento de aula
+                </button>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      <AuditLogPanel />
 
       {isAdmin && (
         <section>
