@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Sparkles, Stethoscope, ShoppingBag, ArrowUpRight } from "lucide-react";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -124,12 +125,7 @@ function HubPage() {
           </div>
         </section>
 
-        <footer className="relative border-t border-border">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
-            <p>© {new Date().getFullYear()} Blindagem 360º. Todos os direitos reservados.</p>
-            <p>Método proprietário · Governança aplicada · Proteção operacional</p>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </div>
   );

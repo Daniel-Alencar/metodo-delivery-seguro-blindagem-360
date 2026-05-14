@@ -9,9 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ModaRouteImport } from './routes/moda'
 import { Route as ManualImpressaoRouteImport } from './routes/manual-impressao'
+import { Route as ManualRouteImport } from './routes/manual'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HofRouteImport } from './routes/hof'
 import { Route as FoodServiceRouteImport } from './routes/food-service'
@@ -26,9 +29,19 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAcompanhamentoRouteImport } from './routes/_authenticated/acompanhamento'
 import { Route as ApiPublicCronArchiveRouteImport } from './routes/api/public/cron-archive'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModaRoute = ModaRouteImport.update({
@@ -39,6 +52,11 @@ const ModaRoute = ModaRouteImport.update({
 const ManualImpressaoRoute = ManualImpressaoRouteImport.update({
   id: '/manual-impressao',
   path: '/manual-impressao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualRoute = ManualRouteImport.update({
+  id: '/manual',
+  path: '/manual',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -114,9 +132,12 @@ export interface FileRoutesByFullPath {
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/signup': typeof SignupRoute
+  '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -131,9 +152,12 @@ export interface FileRoutesByTo {
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/signup': typeof SignupRoute
+  '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -150,9 +174,12 @@ export interface FileRoutesById {
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
   '/login': typeof LoginRoute
+  '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/signup': typeof SignupRoute
+  '/termos': typeof TermosRoute
   '/_authenticated/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -169,9 +196,12 @@ export interface FileRouteTypes {
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/privacidade'
     | '/signup'
+    | '/termos'
     | '/acompanhamento'
     | '/admin'
     | '/dashboard'
@@ -186,9 +216,12 @@ export interface FileRouteTypes {
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/privacidade'
     | '/signup'
+    | '/termos'
     | '/acompanhamento'
     | '/admin'
     | '/dashboard'
@@ -204,9 +237,12 @@ export interface FileRouteTypes {
     | '/food-service'
     | '/hof'
     | '/login'
+    | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/privacidade'
     | '/signup'
+    | '/termos'
     | '/_authenticated/acompanhamento'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -223,19 +259,36 @@ export interface RootRouteChildren {
   FoodServiceRoute: typeof FoodServiceRoute
   HofRoute: typeof HofRoute
   LoginRoute: typeof LoginRoute
+  ManualRoute: typeof ManualRoute
   ManualImpressaoRoute: typeof ManualImpressaoRoute
   ModaRoute: typeof ModaRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   SignupRoute: typeof SignupRoute
+  TermosRoute: typeof TermosRoute
   ApiPublicCronArchiveRoute: typeof ApiPublicCronArchiveRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moda': {
@@ -250,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/manual-impressao'
       fullPath: '/manual-impressao'
       preLoaderRoute: typeof ManualImpressaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual': {
+      id: '/manual'
+      path: '/manual'
+      fullPath: '/manual'
+      preLoaderRoute: typeof ManualRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -374,9 +434,12 @@ const rootRouteChildren: RootRouteChildren = {
   FoodServiceRoute: FoodServiceRoute,
   HofRoute: HofRoute,
   LoginRoute: LoginRoute,
+  ManualRoute: ManualRoute,
   ManualImpressaoRoute: ManualImpressaoRoute,
   ModaRoute: ModaRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   SignupRoute: SignupRoute,
+  TermosRoute: TermosRoute,
   ApiPublicCronArchiveRoute: ApiPublicCronArchiveRoute,
 }
 export const routeTree = rootRouteImport

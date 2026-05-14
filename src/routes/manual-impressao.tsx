@@ -16,18 +16,26 @@ type Module = { id: string; month_index: number; title: string };
 type Week = { id: string; module_id: string; week_index: number; title: string };
 type Doc = { id: string; title: string; description: string | null; body: string | null; week_id: string | null };
 
+function formatCpf(raw: string | null | undefined) {
+  if (!raw) return "";
+  const d = raw.replace(/\D/g, "").padStart(11, "0").slice(0, 11);
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`;
+}
+
 function ManualPage() {
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<Module[]>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
-      const { data: prof } = await supabase.from("profiles").select("full_name, company_name").eq("id", u.user!.id).maybeSingle();
+      const { data: prof } = await supabase.from("profiles").select("full_name, company_name, cpf").eq("id", u.user!.id).maybeSingle();
       setName(prof?.full_name || prof?.company_name || u.user!.email || "");
+      setCpf(formatCpf(prof?.cpf));
 
       const [{ data: m }, { data: w }, { data: d }] = await Promise.all([
         supabase.from("modules").select("id, month_index, title").eq("vertical", "food-service").order("month_index"),
@@ -45,6 +53,8 @@ function ManualPage() {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Montando manual...</div>;
   }
 
+  const watermark = cpf || "USO EXCLUSIVO";
+
   return (
     <div className="bg-white text-black min-h-screen">
       <style>{`
@@ -52,9 +62,40 @@ function ManualPage() {
           .no-print { display: none !important; }
           .page-break { page-break-after: always; }
           body { background: white; }
+          .watermark-layer { position: fixed !important; }
         }
-        @page { size: A4; margin: 18mm 14mm; }
+        @page {
+          size: A4;
+          margin: 18mm 14mm 24mm 14mm;
+          @bottom-center {
+            content: "Documento de uso EXCLUSIVO de ${`"+name.replace(/"/g,'\\"')+"`} (CPF ${`"+watermark+"`}). Proibida a reprodução. Sob pena de responsabilização civil e criminal.";
+            font-size: 8pt;
+            color: #888;
+          }
+        }
       `}</style>
+
+      {/* Marca d'água repetida em diagonal — visível na tela e na impressão */}
+      <div
+        aria-hidden
+        className="watermark-layer pointer-events-none fixed inset-0 z-[1] overflow-hidden"
+        style={{
+          backgroundImage: `repeating-linear-gradient(-30deg, transparent 0 180px, rgba(0,0,0,0.04) 180px 181px)`,
+        }}
+      >
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-6 gap-0">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-center">
+              <span
+                className="select-none text-[14px] font-semibold uppercase tracking-widest text-black/[0.06]"
+                style={{ transform: "rotate(-30deg)" }}
+              >
+                {watermark} · {name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-3">
         <p className="text-sm">Use <b>Ctrl+P</b> (ou Cmd+P) e escolha <b>Salvar como PDF</b>.</p>
@@ -74,8 +115,14 @@ function ManualPage() {
           <p className="mt-3 text-lg text-gray-700">Manual Completo — 40 Modelos</p>
           <div className="mt-12 text-sm text-gray-700">
             <p className="font-medium">{name}</p>
+            <p className="text-gray-500">CPF {watermark}</p>
             <p className="mt-1 text-gray-500">{new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p>
           </div>
+          <p className="mt-12 max-w-md text-[11px] leading-relaxed text-gray-500">
+            Método desenvolvido por <b className="text-gray-700">Dr. Glauber Tiago Giachetta</b>. Documento de uso
+            estritamente pessoal. <b>Proibida a reprodução, redistribuição ou compartilhamento</b>, sob pena de
+            responsabilização civil e criminal (Lei 9.610/98 e arts. 184 e ss. do CP).
+          </p>
         </section>
 
         {/* Sumário */}
@@ -141,8 +188,12 @@ function ManualPage() {
           );
         })()}
 
-        <footer className="mt-20 border-t border-gray-300 pt-4 text-center text-xs text-gray-500">
-          Blindagem 360º — Método Delivery Seguro™ — © {new Date().getFullYear()}
+        <footer className="mt-20 border-t border-gray-300 pt-4 text-center text-[11px] leading-relaxed text-gray-500">
+          <p>Blindagem 360º — Método Delivery Seguro™ — © 2026 Dr. Glauber Tiago Giachetta. ® Proibida a reprodução.</p>
+          <p className="mt-1">
+            Documento de uso EXCLUSIVO de <b>{name}</b> — CPF <b>{watermark}</b>. Reprodução, redistribuição ou
+            compartilhamento sujeitos a responsabilização <b>civil e criminal</b>.
+          </p>
         </footer>
       </main>
     </div>
