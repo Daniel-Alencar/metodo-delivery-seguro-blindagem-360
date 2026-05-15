@@ -93,14 +93,24 @@ function DocumentosPage() {
         </div>
       )}
 
-      {open && (
-        <Modal onClose={() => setOpen(null)} title={open.title}>
-          <p className="text-sm text-muted-foreground">{open.description}</p>
-          <pre className="mt-4 max-h-[60vh] whitespace-pre-wrap rounded-md border border-border bg-background/60 p-4 text-sm">
-            {open.body || "(documento sem corpo)"}
-          </pre>
-        </Modal>
-      )}
+      {open && (() => {
+        const wk = open.week_id ? weeks.find((x) => x.id === open.week_id) : null;
+        return (
+          <Modal onClose={() => setOpen(null)} title={open.title}>
+            {wk && (
+              <div className="mb-4 rounded-md border border-cyan-500/30 bg-cyan-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-cyan-200">Aula vinculada · Semana {wk.week_index}</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{wk.title}</p>
+                {wk.summary && <p className="mt-2 text-xs text-muted-foreground">{wk.summary}</p>}
+              </div>
+            )}
+            {open.description && <p className="text-sm text-muted-foreground">{open.description}</p>}
+            <pre className="mt-4 max-h-[60vh] overflow-auto whitespace-pre-wrap rounded-md border border-border bg-background/60 p-4 text-sm">
+              {open.body || "(documento sem corpo)"}
+            </pre>
+          </Modal>
+        );
+      })()}
 
       {adding && (
         <Modal onClose={() => setAdding(false)} title="Novo documento">
