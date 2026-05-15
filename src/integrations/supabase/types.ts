@@ -448,6 +448,36 @@ export type Database = {
           },
         ]
       }
+      week_task_overrides: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          enrollment_id: string
+          id: string
+          updated_at: string
+          week_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          enrollment_id: string
+          id?: string
+          updated_at?: string
+          week_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          enrollment_id?: string
+          id?: string
+          updated_at?: string
+          week_id?: string
+        }
+        Relationships: []
+      }
       weeks: {
         Row: {
           agenda: string | null

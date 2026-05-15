@@ -9,26 +9,30 @@ export const Route = createFileRoute("/_authenticated/documentos")({
   component: DocumentosPage,
 });
 
-type Doc = { id: string; title: string; description: string | null; body: string | null; version: string; module_id: string | null };
+type Doc = { id: string; title: string; description: string | null; body: string | null; version: string; module_id: string | null; week_id: string | null };
 type Module = { id: string; month_index: number; title: string };
+type Week = { id: string; week_index: number; title: string; summary: string | null };
 
 function DocumentosPage() {
   const { isStaff } = useAuth();
   const [loading, setLoading] = useState(true);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
+  const [weeks, setWeeks] = useState<Week[]>([]);
   const [open, setOpen] = useState<Doc | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", body: "", module_id: "" });
 
   async function load() {
     setLoading(true);
-    const [{ data: d }, { data: m }] = await Promise.all([
+    const [{ data: d }, { data: m }, { data: w }] = await Promise.all([
       supabase.from("documents").select("*").order("created_at", { ascending: false }),
       supabase.from("modules").select("id, month_index, title").eq("vertical", "food-service").order("month_index"),
+      supabase.from("weeks").select("id, week_index, title, summary").order("week_index"),
     ]);
     setDocs((d ?? []) as Doc[]);
     setModules((m ?? []) as Module[]);
+    setWeeks((w ?? []) as Week[]);
     setLoading(false);
   }
 
@@ -54,9 +58,9 @@ function DocumentosPage() {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Biblioteca</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documentos Vivos</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documento / Aula</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Templates contextualizados, versionados, prontos para sua operação.
+            Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo.
           </p>
         </div>
         {isStaff && (
@@ -89,14 +93,24 @@ function DocumentosPage() {
         </div>
       )}
 
-      {open && (
-        <Modal onClose={() => setOpen(null)} title={open.title}>
-          <p className="text-sm text-muted-foreground">{open.description}</p>
-          <pre className="mt-4 max-h-[60vh] whitespace-pre-wrap rounded-md border border-border bg-background/60 p-4 text-sm">
-            {open.body || "(documento sem corpo)"}
-          </pre>
-        </Modal>
-      )}
+      {open && (() => {
+        const wk = open.week_id ? weeks.find((x) => x.id === open.week_id) : null;
+        return (
+          <Modal onClose={() => setOpen(null)} title={open.title}>
+            {wk && (
+              <div className="mb-4 rounded-md border border-cyan-500/30 bg-cyan-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-cyan-200">Aula vinculada · Semana {wk.week_index}</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{wk.title}</p>
+                {wk.summary && <p className="mt-2 text-xs text-muted-foreground">{wk.summary}</p>}
+              </div>
+            )}
+            {open.description && <p className="text-sm text-muted-foreground">{open.description}</p>}
+            <pre className="mt-4 max-h-[60vh] overflow-auto whitespace-pre-wrap rounded-md border border-border bg-background/60 p-4 text-sm">
+              {open.body || "(documento sem corpo)"}
+            </pre>
+          </Modal>
+        );
+      })()}
 
       {adding && (
         <Modal onClose={() => setAdding(false)} title="Novo documento">

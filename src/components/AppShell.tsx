@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, FileText, AlertTriangle, Crown, LogOut, GraduationCap, Repeat, HeartPulse } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, AlertTriangle, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode, clearViewMode } from "@/hooks/use-view-mode";
 import type { ReactNode } from "react";
@@ -21,10 +21,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             {isClient && <NavItem to="/dashboard" icon={LayoutDashboard} label="Trilha" />}
+            {isClient && <NavItem to="/tarefas" icon={ClipboardList} label="Tarefa da semana" />}
             {isClient && <NavItem to="/acompanhamento" icon={HeartPulse} label="Acompanhamento" />}
-            <NavItem to="/documentos" icon={FileText} label="Documentos" />
+            <NavItem to="/documentos" icon={FileText} label={isClient ? "Documento / Aula" : "Documentos"} />
             <NavItem to="/incidentes" icon={AlertTriangle} label="Incidentes" />
-            {isStaff && <NavItem to="/admin" icon={Crown} label="Admin" />}
+            {isStaff && <NavItem to="/admin" icon={Crown} label="Admin" /> }
           </nav>
           <div className="flex items-center gap-2">
             {mode && (
