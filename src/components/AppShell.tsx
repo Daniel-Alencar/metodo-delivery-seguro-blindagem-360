@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, FileText, AlertTriangle, Crown, LogOut, GraduationCap, Repeat, HeartPulse } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, AlertTriangle, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode, clearViewMode } from "@/hooks/use-view-mode";
 import type { ReactNode } from "react";
