@@ -58,9 +58,9 @@ function DocumentosPage() {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Biblioteca</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documentos Vivos</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documento / Aula</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Templates contextualizados, versionados, prontos para sua operação.
+            Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo.
           </p>
         </div>
         {isStaff && (
