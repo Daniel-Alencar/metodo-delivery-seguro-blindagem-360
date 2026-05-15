@@ -22,6 +22,7 @@ import { Route as EsteticaRouteImport } from './routes/estetica'
 import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticated/tarefas'
 import { Route as AuthenticatedIncidentesRouteImport } from './routes/_authenticated/incidentes'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -93,6 +94,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTarefasRoute = AuthenticatedTarefasRouteImport.update({
+  id: '/tarefas',
+  path: '/tarefas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedIncidentesRoute = AuthenticatedIncidentesRouteImport.update({
   id: '/incidentes',
   path: '/incidentes',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRoutesByTo {
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRoutesById {
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/incidentes': typeof AuthenticatedIncidentesRoute
+  '/_authenticated/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRouteTypes {
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/tarefas'
     | '/api/public/cron-archive'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/tarefas'
     | '/api/public/cron-archive'
   id:
     | '__root__'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/documentos'
     | '/_authenticated/incidentes'
+    | '/_authenticated/tarefas'
     | '/api/public/cron-archive'
   fileRoutesById: FileRoutesById
 }
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tarefas': {
+      id: '/_authenticated/tarefas'
+      path: '/tarefas'
+      fullPath: '/tarefas'
+      preLoaderRoute: typeof AuthenticatedTarefasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/incidentes': {
       id: '/_authenticated/incidentes'
       path: '/incidentes'
@@ -412,6 +431,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedIncidentesRoute: typeof AuthenticatedIncidentesRoute
+  AuthenticatedTarefasRoute: typeof AuthenticatedTarefasRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -420,6 +440,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedIncidentesRoute: AuthenticatedIncidentesRoute,
+  AuthenticatedTarefasRoute: AuthenticatedTarefasRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

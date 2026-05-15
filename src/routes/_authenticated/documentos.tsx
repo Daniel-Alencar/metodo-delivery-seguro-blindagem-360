@@ -9,26 +9,30 @@ export const Route = createFileRoute("/_authenticated/documentos")({
   component: DocumentosPage,
 });
 
-type Doc = { id: string; title: string; description: string | null; body: string | null; version: string; module_id: string | null };
+type Doc = { id: string; title: string; description: string | null; body: string | null; version: string; module_id: string | null; week_id: string | null };
 type Module = { id: string; month_index: number; title: string };
+type Week = { id: string; week_index: number; title: string; summary: string | null };
 
 function DocumentosPage() {
   const { isStaff } = useAuth();
   const [loading, setLoading] = useState(true);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
+  const [weeks, setWeeks] = useState<Week[]>([]);
   const [open, setOpen] = useState<Doc | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", body: "", module_id: "" });
 
   async function load() {
     setLoading(true);
-    const [{ data: d }, { data: m }] = await Promise.all([
+    const [{ data: d }, { data: m }, { data: w }] = await Promise.all([
       supabase.from("documents").select("*").order("created_at", { ascending: false }),
       supabase.from("modules").select("id, month_index, title").eq("vertical", "food-service").order("month_index"),
+      supabase.from("weeks").select("id, week_index, title, summary").order("week_index"),
     ]);
     setDocs((d ?? []) as Doc[]);
     setModules((m ?? []) as Module[]);
+    setWeeks((w ?? []) as Week[]);
     setLoading(false);
   }
 
