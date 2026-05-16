@@ -17,6 +17,7 @@ type ProgressRow = {
   id: string; status: string; submitted_at: string | null; week_id: string;
   enrollment_id: string;
 };
+type ProfileLite = { id: string; full_name: string | null; company_name: string | null; cnpj: string | null };
 
 type Mentor = { user_id: string; email: string; full_name: string; is_admin: boolean; granted_at: string };
 
