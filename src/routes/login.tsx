@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — Blindagem 360º" }] }),
@@ -68,12 +69,13 @@ function LoginPage() {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wider text-muted-foreground">Senha</label>
-            <input
-              type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-foreground/40"
-              autoComplete="current-password"
-            />
+            <div className="flex items-center justify-between">
+              <label className="text-xs uppercase tracking-wider text-muted-foreground">Senha</label>
+              <Link to="/esqueci-senha" className="text-xs text-muted-foreground hover:text-foreground">Esqueci minha senha</Link>
+            </div>
+            <div className="mt-1">
+              <PasswordInput value={password} onChange={setPassword} required autoComplete="current-password" />
+            </div>
           </div>
           {error && <p className="text-sm text-red-300">{error}</p>}
           <button

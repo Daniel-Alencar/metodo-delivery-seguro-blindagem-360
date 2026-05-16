@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ModaRouteImport } from './routes/moda'
 import { Route as ManualImpressaoRouteImport } from './routes/manual-impressao'
@@ -19,10 +20,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as HofRouteImport } from './routes/hof'
 import { Route as FoodServiceRouteImport } from './routes/food-service'
 import { Route as EsteticaRouteImport } from './routes/estetica'
+import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticated/tarefas'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedIncidentesRouteImport } from './routes/_authenticated/incidentes'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -38,6 +41,11 @@ const TermosRoute = TermosRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -80,6 +88,11 @@ const EsteticaRoute = EsteticaRouteImport.update({
   path: '/estetica',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EscolherPerfilRoute = EscolherPerfilRouteImport.update({
   id: '/escolher-perfil',
   path: '/escolher-perfil',
@@ -97,6 +110,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedTarefasRoute = AuthenticatedTarefasRouteImport.update({
   id: '/tarefas',
   path: '/tarefas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedIncidentesRoute = AuthenticatedIncidentesRouteImport.update({
@@ -134,6 +152,7 @@ const ApiPublicCronArchiveRoute = ApiPublicCronArchiveRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
@@ -142,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
@@ -149,12 +169,14 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
@@ -163,6 +185,7 @@ export interface FileRoutesByTo {
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
@@ -170,6 +193,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
@@ -178,6 +202,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/escolher-perfil': typeof EscolherPerfilRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
   '/food-service': typeof FoodServiceRoute
   '/hof': typeof HofRoute
@@ -186,6 +211,7 @@ export interface FileRoutesById {
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/_authenticated/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
@@ -193,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/incidentes': typeof AuthenticatedIncidentesRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
 }
@@ -201,6 +228,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/escolher-perfil'
+    | '/esqueci-senha'
     | '/estetica'
     | '/food-service'
     | '/hof'
@@ -209,6 +237,7 @@ export interface FileRouteTypes {
     | '/manual-impressao'
     | '/moda'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/signup'
     | '/termos'
     | '/acompanhamento'
@@ -216,12 +245,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/escolher-perfil'
+    | '/esqueci-senha'
     | '/estetica'
     | '/food-service'
     | '/hof'
@@ -230,6 +261,7 @@ export interface FileRouteTypes {
     | '/manual-impressao'
     | '/moda'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/signup'
     | '/termos'
     | '/acompanhamento'
@@ -237,6 +269,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documentos'
     | '/incidentes'
+    | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
   id:
@@ -244,6 +277,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/escolher-perfil'
+    | '/esqueci-senha'
     | '/estetica'
     | '/food-service'
     | '/hof'
@@ -252,6 +286,7 @@ export interface FileRouteTypes {
     | '/manual-impressao'
     | '/moda'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/signup'
     | '/termos'
     | '/_authenticated/acompanhamento'
@@ -259,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/documentos'
     | '/_authenticated/incidentes'
+    | '/_authenticated/perfil'
     | '/_authenticated/tarefas'
     | '/api/public/cron-archive'
   fileRoutesById: FileRoutesById
@@ -267,6 +303,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   EscolherPerfilRoute: typeof EscolherPerfilRoute
+  EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   EsteticaRoute: typeof EsteticaRoute
   FoodServiceRoute: typeof FoodServiceRoute
   HofRoute: typeof HofRoute
@@ -275,6 +312,7 @@ export interface RootRouteChildren {
   ManualImpressaoRoute: typeof ManualImpressaoRoute
   ModaRoute: typeof ModaRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SignupRoute: typeof SignupRoute
   TermosRoute: typeof TermosRoute
   ApiPublicCronArchiveRoute: typeof ApiPublicCronArchiveRoute
@@ -294,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -352,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EsteticaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/esqueci-senha': {
+      id: '/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/esqueci-senha'
+      preLoaderRoute: typeof EsqueciSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/escolher-perfil': {
       id: '/escolher-perfil'
       path: '/escolher-perfil'
@@ -378,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/tarefas'
       fullPath: '/tarefas'
       preLoaderRoute: typeof AuthenticatedTarefasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/incidentes': {
@@ -431,6 +490,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedIncidentesRoute: typeof AuthenticatedIncidentesRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedTarefasRoute: typeof AuthenticatedTarefasRoute
 }
 
@@ -440,6 +500,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedIncidentesRoute: AuthenticatedIncidentesRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedTarefasRoute: AuthenticatedTarefasRoute,
 }
 
@@ -451,6 +512,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   EscolherPerfilRoute: EscolherPerfilRoute,
+  EsqueciSenhaRoute: EsqueciSenhaRoute,
   EsteticaRoute: EsteticaRoute,
   FoodServiceRoute: FoodServiceRoute,
   HofRoute: HofRoute,
@@ -459,6 +521,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManualImpressaoRoute: ManualImpressaoRoute,
   ModaRoute: ModaRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   SignupRoute: SignupRoute,
   TermosRoute: TermosRoute,
   ApiPublicCronArchiveRoute: ApiPublicCronArchiveRoute,

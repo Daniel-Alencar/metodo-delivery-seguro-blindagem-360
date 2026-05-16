@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Criar acesso — Blindagem 360º" }] }),
@@ -96,7 +97,12 @@ function SignupPage() {
           <Field label="Empresa / razão social" value={companyName} onChange={setCompanyName} />
           <Field label="Telefone (WhatsApp)" value={phone} onChange={setPhone} />
           <Field label="E-mail" type="email" value={email} onChange={setEmail} required />
-          <Field label="Senha (mín. 6 caracteres)" type="password" value={password} onChange={setPassword} required />
+          <div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">Senha (mín. 6 caracteres)</label>
+            <div className="mt-1">
+              <PasswordInput value={password} onChange={setPassword} required autoComplete="new-password" />
+            </div>
+          </div>
 
           <div className="space-y-3 rounded-md border border-border bg-card/40 p-4 text-xs">
             <Checkbox checked={acceptTerms} onChange={setAcceptTerms}>
