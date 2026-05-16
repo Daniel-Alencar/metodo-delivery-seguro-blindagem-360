@@ -216,7 +216,7 @@ function AcompanhamentoPage() {
         </div>
       </section>
 
-      {enrollment.status === "archiving" && enrollment.archive_at && (
+      {enrollment?.status === "archiving" && enrollment?.archive_at && (
         <section className="rounded-2xl border border-red-500/40 bg-red-500/5 p-5">
           <div className="flex items-center gap-2 text-red-300">
             <AlertTriangle className="h-4 w-4" />
