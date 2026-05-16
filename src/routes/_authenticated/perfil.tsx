@@ -75,10 +75,11 @@ function PerfilPage() {
         <section className="rounded-xl border border-border bg-card/60 p-6">
           <h2 className="flex items-center gap-2 text-base font-semibold"><User className="h-4 w-4" /> Dados cadastrais</h2>
           <form onSubmit={saveProfile} className="mt-5 space-y-4">
-            <Field label="Nome completo" value={profile?.full_name ?? ""} onChange={(v) => setProfile((p) => p ? { ...p, full_name: v } : p)} />
+            <Field label="Nome completo (quem recebe o treinamento)" value={profile?.full_name ?? ""} onChange={(v) => setProfile((p) => p ? { ...p, full_name: v } : p)} />
             <Field label="CPF" value={profile?.cpf ?? ""} readOnly />
             <Field label="E-mail" value={user?.email ?? ""} readOnly />
             <Field label="Empresa / razão social" value={profile?.company_name ?? ""} onChange={(v) => setProfile((p) => p ? { ...p, company_name: v } : p)} />
+            <Field label="CNPJ" value={profile?.cnpj ?? ""} onChange={(v) => setProfile((p) => p ? { ...p, cnpj: v } : p)} />
             <Field label="Telefone (WhatsApp)" value={profile?.phone ?? ""} onChange={(v) => setProfile((p) => p ? { ...p, phone: v } : p)} />
             {savedMsg && <p className="text-sm text-emerald-300">{savedMsg}</p>}
             <button type="submit" disabled={saving} className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background disabled:opacity-50">
