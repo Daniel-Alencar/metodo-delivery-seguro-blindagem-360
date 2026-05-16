@@ -258,6 +258,7 @@ export type Database = {
         Row: {
           accepted_lgpd_at: string | null
           accepted_terms_at: string | null
+          cnpj: string | null
           company_name: string | null
           cpf: string | null
           created_at: string
@@ -270,6 +271,7 @@ export type Database = {
         Insert: {
           accepted_lgpd_at?: string | null
           accepted_terms_at?: string | null
+          cnpj?: string | null
           company_name?: string | null
           cpf?: string | null
           created_at?: string
@@ -282,6 +284,7 @@ export type Database = {
         Update: {
           accepted_lgpd_at?: string | null
           accepted_terms_at?: string | null
+          cnpj?: string | null
           company_name?: string | null
           cpf?: string | null
           created_at?: string
