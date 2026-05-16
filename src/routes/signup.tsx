@@ -14,6 +14,7 @@ function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [cnpj, setCnpj] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,6 +56,7 @@ function SignupPage() {
     if (userId) {
       await supabase.from("profiles").update({
         cpf: cpfDigits,
+        cnpj: cnpj.replace(/\D/g, "") || null,
         accepted_terms_at: new Date().toISOString(),
         accepted_lgpd_at: new Date().toISOString(),
         marketing_consent: marketingConsent,
@@ -92,9 +94,10 @@ function SignupPage() {
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
-          <Field label="Nome completo" value={fullName} onChange={setFullName} required />
+          <Field label="Nome completo (quem receberá o treinamento)" value={fullName} onChange={setFullName} required />
           <Field label="CPF (apenas números)" value={cpf} onChange={setCpf} required />
           <Field label="Empresa / razão social" value={companyName} onChange={setCompanyName} />
+          <Field label="CNPJ (apenas números)" value={cnpj} onChange={setCnpj} />
           <Field label="Telefone (WhatsApp)" value={phone} onChange={setPhone} />
           <Field label="E-mail" type="email" value={email} onChange={setEmail} required />
           <div>

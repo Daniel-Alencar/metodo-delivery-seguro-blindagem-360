@@ -63,7 +63,12 @@ function AcompanhamentoPage() {
     return <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   }
 
-  if (!enrollment || !["graduated", "archiving", "archived"].includes(enrollment.status)) {
+  // ⚠️ MODO TESTE: liberado para todos enquanto avaliamos o sistema.
+  // Quando finalizar a fase de testes, basta trocar para `false` —
+  // o acesso volta a exigir conclusão das 4 semanas + acompanhamento pago.
+  const FOLLOWUP_TEST_MODE = true;
+
+  if (!FOLLOWUP_TEST_MODE && (!enrollment || !["graduated", "archiving", "archived"].includes(enrollment.status))) {
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-10 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Acompanhamento</h1>
@@ -211,7 +216,7 @@ function AcompanhamentoPage() {
         </div>
       </section>
 
-      {enrollment.status === "archiving" && enrollment.archive_at && (
+      {enrollment?.status === "archiving" && enrollment?.archive_at && (
         <section className="rounded-2xl border border-red-500/40 bg-red-500/5 p-5">
           <div className="flex items-center gap-2 text-red-300">
             <AlertTriangle className="h-4 w-4" />

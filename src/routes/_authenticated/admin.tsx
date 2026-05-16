@@ -17,6 +17,7 @@ type ProgressRow = {
   id: string; status: string; submitted_at: string | null; week_id: string;
   enrollment_id: string;
 };
+type ProfileLite = { id: string; full_name: string | null; company_name: string | null; cnpj: string | null };
 
 type Mentor = { user_id: string; email: string; full_name: string; is_admin: boolean; granted_at: string };
 
@@ -27,6 +28,7 @@ function AdminPage() {
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
+  const [profilesById, setProfilesById] = useState<Record<string, ProfileLite>>({});
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
@@ -45,8 +47,21 @@ function AdminPage() {
       supabase.from("enrollments").select("*").order("created_at", { ascending: false }),
       supabase.from("week_progress").select("*").eq("status", "submitted"),
     ]);
-    setEnrollments((e ?? []) as EnrollmentRow[]);
+    const enr = (e ?? []) as EnrollmentRow[];
+    setEnrollments(enr);
     setPending((p ?? []) as ProgressRow[]);
+    const ids = Array.from(new Set(enr.map((x) => x.user_id)));
+    if (ids.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, company_name, cnpj")
+        .in("id", ids);
+      const map: Record<string, ProfileLite> = {};
+      (profs ?? []).forEach((pr) => { map[(pr as ProfileLite).id] = pr as ProfileLite; });
+      setProfilesById(map);
+    } else {
+      setProfilesById({});
+    }
     if (isAdmin) await loadMentors();
     setLoading(false);
   }
@@ -243,34 +258,41 @@ function AdminPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
-                      <th className="px-4 py-3 text-left">Cliente</th>
-                      <th className="px-4 py-3 text-left">Vertical</th>
+                      <th className="px-4 py-3 text-left">Empresa</th>
+                      <th className="px-4 py-3 text-left">CNPJ</th>
+                      <th className="px-4 py-3 text-left">Treinando</th>
+                      <th className="px-4 py-3 text-left">Código</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-left">Criado</th>
                       <th className="px-4 py-3 text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {enrollments.map((e) => (
-                      <tr key={e.id} className="border-t border-border bg-background/30">
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{e.user_id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3">{e.vertical}</td>
-                        <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
-                        <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
-                        <td className="px-4 py-3 text-right">
-                          {e.status !== "active" && (
-                            <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
-                              Ativar
-                            </button>
-                          )}
-                          {e.status === "active" && (
-                            <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
-                              Pausar
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {enrollments.map((e) => {
+                      const pr = profilesById[e.user_id];
+                      return (
+                        <tr key={e.id} className="border-t border-border bg-background/30">
+                          <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{e.user_id.slice(0, 8)}</td>
+                          <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
+                          <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
+                          <td className="px-4 py-3 text-right">
+                            {e.status !== "active" && (
+                              <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
+                                Ativar
+                              </button>
+                            )}
+                            {e.status === "active" && (
+                              <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
+                                Pausar
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
