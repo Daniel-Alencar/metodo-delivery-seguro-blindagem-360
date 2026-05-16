@@ -41,7 +41,8 @@ function PerfilPage() {
     if (!profile) return;
     setSaving(true); setSavedMsg(null);
     const { error } = await supabase.from("profiles").update({
-      full_name: profile.full_name, company_name: profile.company_name, phone: profile.phone,
+      full_name: profile.full_name, company_name: profile.company_name,
+      cnpj: profile.cnpj, phone: profile.phone,
     }).eq("id", profile.id);
     setSaving(false);
     setSavedMsg(error ? `Erro: ${error.message}` : "Dados atualizados.");
