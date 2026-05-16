@@ -14,6 +14,7 @@ function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [cnpj, setCnpj] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
