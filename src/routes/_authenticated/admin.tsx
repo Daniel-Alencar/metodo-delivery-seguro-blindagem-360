@@ -258,34 +258,41 @@ function AdminPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
-                      <th className="px-4 py-3 text-left">Cliente</th>
-                      <th className="px-4 py-3 text-left">Vertical</th>
+                      <th className="px-4 py-3 text-left">Empresa</th>
+                      <th className="px-4 py-3 text-left">CNPJ</th>
+                      <th className="px-4 py-3 text-left">Treinando</th>
+                      <th className="px-4 py-3 text-left">Código</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-left">Criado</th>
                       <th className="px-4 py-3 text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {enrollments.map((e) => (
-                      <tr key={e.id} className="border-t border-border bg-background/30">
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{e.user_id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3">{e.vertical}</td>
-                        <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
-                        <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
-                        <td className="px-4 py-3 text-right">
-                          {e.status !== "active" && (
-                            <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
-                              Ativar
-                            </button>
-                          )}
-                          {e.status === "active" && (
-                            <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
-                              Pausar
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {enrollments.map((e) => {
+                      const pr = profilesById[e.user_id];
+                      return (
+                        <tr key={e.id} className="border-t border-border bg-background/30">
+                          <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{e.user_id.slice(0, 8)}</td>
+                          <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
+                          <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
+                          <td className="px-4 py-3 text-right">
+                            {e.status !== "active" && (
+                              <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
+                                Ativar
+                              </button>
+                            )}
+                            {e.status === "active" && (
+                              <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
+                                Pausar
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
