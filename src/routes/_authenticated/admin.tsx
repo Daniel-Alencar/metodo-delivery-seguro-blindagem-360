@@ -47,8 +47,21 @@ function AdminPage() {
       supabase.from("enrollments").select("*").order("created_at", { ascending: false }),
       supabase.from("week_progress").select("*").eq("status", "submitted"),
     ]);
-    setEnrollments((e ?? []) as EnrollmentRow[]);
+    const enr = (e ?? []) as EnrollmentRow[];
+    setEnrollments(enr);
     setPending((p ?? []) as ProgressRow[]);
+    const ids = Array.from(new Set(enr.map((x) => x.user_id)));
+    if (ids.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, company_name, cnpj")
+        .in("id", ids);
+      const map: Record<string, ProfileLite> = {};
+      (profs ?? []).forEach((pr) => { map[(pr as ProfileLite).id] = pr as ProfileLite; });
+      setProfilesById(map);
+    } else {
+      setProfilesById({});
+    }
     if (isAdmin) await loadMentors();
     setLoading(false);
   }
