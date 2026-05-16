@@ -94,9 +94,10 @@ function SignupPage() {
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
-          <Field label="Nome completo" value={fullName} onChange={setFullName} required />
+          <Field label="Nome completo (quem receberá o treinamento)" value={fullName} onChange={setFullName} required />
           <Field label="CPF (apenas números)" value={cpf} onChange={setCpf} required />
           <Field label="Empresa / razão social" value={companyName} onChange={setCompanyName} />
+          <Field label="CNPJ (apenas números)" value={cnpj} onChange={setCnpj} />
           <Field label="Telefone (WhatsApp)" value={phone} onChange={setPhone} />
           <Field label="E-mail" type="email" value={email} onChange={setEmail} required />
           <div>
