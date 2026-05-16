@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/perfil")({
 
 type Profile = {
   id: string; full_name: string | null; cpf: string | null;
-  company_name: string | null; phone: string | null;
+  company_name: string | null; cnpj: string | null; phone: string | null;
 };
 
 function PerfilPage() {
