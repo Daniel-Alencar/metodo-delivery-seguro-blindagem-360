@@ -28,6 +28,7 @@ function AdminPage() {
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
+  const [profilesById, setProfilesById] = useState<Record<string, ProfileLite>>({});
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
