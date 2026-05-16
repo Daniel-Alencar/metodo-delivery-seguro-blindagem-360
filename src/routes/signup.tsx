@@ -56,6 +56,7 @@ function SignupPage() {
     if (userId) {
       await supabase.from("profiles").update({
         cpf: cpfDigits,
+        cnpj: cnpj.replace(/\D/g, "") || null,
         accepted_terms_at: new Date().toISOString(),
         accepted_lgpd_at: new Date().toISOString(),
         marketing_consent: marketingConsent,
