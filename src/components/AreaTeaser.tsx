@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, Sparkles, BellRing, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
+import { LeadCaptureButton } from "@/components/LeadCaptureModal";
 
 export type AreaTeaserProps = {
   eyebrow: string;
@@ -10,6 +11,7 @@ export type AreaTeaserProps = {
   pillars: { title: string; desc: string }[];
   accent: string; // tailwind gradient classes
   glow: string; // oklch
+  vertical: "estetica" | "hof" | "moda";
 };
 
 export function AreaTeaser(props: AreaTeaserProps) {
