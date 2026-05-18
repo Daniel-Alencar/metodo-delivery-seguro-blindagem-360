@@ -11,6 +11,7 @@ import {
   Lock,
   Sparkles,
 } from "lucide-react";
+import foodHero from "@/assets/food-service-hero.jpg";
 
 export const Route = createFileRoute("/food-service")({
   head: () => ({
