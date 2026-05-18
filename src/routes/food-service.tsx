@@ -128,34 +128,50 @@ function FoodServicePage() {
       </header>
 
       {/* HERO */}
-      <section className="relative mx-auto max-w-7xl px-6 pt-12 pb-16 md:pt-20 md:pb-24">
-        <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
-          <Sparkles className="h-3 w-3" />
-          Método Delivery Seguro™
-        </div>
-        <h1 className="mt-5 max-w-4xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
-          A central operacional de blindagem para o food service.
-        </h1>
-        <p className="mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
-          Não é um repositório de PDFs. É um sistema vivo de implementação jurídica e operacional —
-          jornada guiada de 4 meses, documentos contextualizados, central de incidentes e governança
-          aplicada à realidade do delivery.
-        </p>
+      <section className="relative mx-auto grid max-w-7xl gap-10 px-6 pt-12 pb-16 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-20 md:pb-24">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
+            <Sparkles className="h-3 w-3" />
+            Método Delivery Seguro™
+          </div>
+          <h1 className="mt-5 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
+            A central operacional de blindagem para o food service.
+          </h1>
+          <p className="mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
+            Não é um repositório de PDFs. É um sistema vivo de implementação jurídica e operacional —
+            jornada guiada de 4 meses, documentos contextualizados, central de incidentes e governança
+            aplicada à realidade do delivery.
+          </p>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            to="/signup"
-            className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
-          >
-            Ativar minha blindagem
-            <ShieldCheck className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card backdrop-blur"
-          >
-            Já sou cliente · Entrar
-          </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
+            >
+              Ativar minha blindagem
+              <ShieldCheck className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card backdrop-blur"
+            >
+              Já sou cliente · Entrar
+            </Link>
+          </div>
+        </div>
+
+        <div
+          className="relative overflow-hidden rounded-2xl border border-border"
+          style={{ boxShadow: "0 30px 80px -30px oklch(0.7 0.18 40 / 0.6)" }}
+        >
+          <img
+            src={foodHero}
+            alt="Operação de food service: entrega protegida da cozinha ao motoboy"
+            width={1536}
+            height={1024}
+            className="h-full w-full object-cover"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-orange-500/15 via-amber-500/5 to-transparent" />
         </div>
       </section>
 
