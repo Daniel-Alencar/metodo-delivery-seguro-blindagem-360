@@ -68,6 +68,7 @@ export type Database = {
       enrollments: {
         Row: {
           archive_at: string | null
+          assigned_mentor_id: string | null
           completed_at: string | null
           created_at: string
           id: string
@@ -80,6 +81,7 @@ export type Database = {
         }
         Insert: {
           archive_at?: string | null
+          assigned_mentor_id?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -92,6 +94,7 @@ export type Database = {
         }
         Update: {
           archive_at?: string | null
+          assigned_mentor_id?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -376,6 +379,92 @@ export type Database = {
           },
         ]
       }
+      support_ticket_messages: {
+        Row: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at: string
+          id: string
+          ticket_id: string
+        }
+        Insert: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at?: string
+          id?: string
+          ticket_id: string
+        }
+        Update: {
+          author_id?: string
+          author_role?: string
+          body?: string
+          created_at?: string
+          id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          answered_at: string | null
+          body: string
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          enrollment_id: string | null
+          id: string
+          last_reply_at: string | null
+          mentor_id: string | null
+          opened_at: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string | null
+          body: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          last_reply_at?: string | null
+          mentor_id?: string | null
+          opened_at?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answered_at?: string | null
+          body?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          enrollment_id?: string | null
+          id?: string
+          last_reply_at?: string | null
+          mentor_id?: string | null
+          opened_at?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -394,6 +483,33 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vertical_leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          vertical: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          vertical: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          vertical?: string
         }
         Relationships: []
       }
@@ -596,6 +712,12 @@ export type Database = {
       }
       admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
       cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
+      close_support_ticket: { Args: { _ticket_id: string }; Returns: undefined }
+      close_week_class: {
+        Args: { _enrollment_id: string; _notes?: string; _week_id: string }
+        Returns: string
+      }
+      count_open_tickets_for_staff: { Args: never; Returns: number }
       daily_archive_expired: { Args: never; Returns: number }
       log_class_attendance: {
         Args: { _enrollment_id: string; _notes?: string; _week_id: string }
@@ -603,6 +725,14 @@ export type Database = {
       }
       maybe_graduate_enrollment: {
         Args: { _enrollment_id: string }
+        Returns: undefined
+      }
+      open_support_ticket: {
+        Args: { _body: string; _title: string }
+        Returns: string
+      }
+      reply_support_ticket: {
+        Args: { _body: string; _ticket_id: string }
         Returns: undefined
       }
       request_archive: { Args: { _enrollment_id: string }; Returns: string }
@@ -636,6 +766,7 @@ export type Database = {
         | "mentor_revoked"
         | "archive_requested"
         | "archive_cancelled"
+      ticket_status: "open" | "answered" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
     CompositeTypes: {
@@ -795,6 +926,7 @@ export const Constants = {
         "archive_requested",
         "archive_cancelled",
       ],
+      ticket_status: ["open", "answered", "closed"],
       week_status: ["locked", "in_progress", "submitted", "approved"],
     },
   },

@@ -11,6 +11,7 @@ export const Route = createFileRoute("/hof")({
   }),
   component: () => (
     <AreaTeaser
+      vertical="hof"
       eyebrow="Em construção"
       title="HOF — Harmonização Orofacial"
       tagline="Procedimentos médicos estéticos com proteção regulatória, técnica e probatória."

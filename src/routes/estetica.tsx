@@ -11,6 +11,7 @@ export const Route = createFileRoute("/estetica")({
   }),
   component: () => (
     <AreaTeaser
+      vertical="estetica"
       eyebrow="Em construção"
       title="Estética"
       tagline="Para clínicas e profissionais que tratam pele, corpo e autoestima."

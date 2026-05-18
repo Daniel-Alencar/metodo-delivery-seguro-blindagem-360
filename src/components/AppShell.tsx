@@ -1,7 +1,9 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, FileText, AlertTriangle, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode, clearViewMode } from "@/hooks/use-view-mode";
+import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -10,6 +12,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { mode, canSwitch, isAdminView } = useViewMode();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
+  const [openTickets, setOpenTickets] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isStaff) return;
+    let stop = false;
+    async function load() {
+      const { data } = await supabase.rpc("count_open_tickets_for_staff" as never);
+      if (!stop) setOpenTickets(typeof data === "number" ? data : 0);
+    }
+    load();
+    const i = setInterval(load, 30000);
+    return () => { stop = true; clearInterval(i); };
+  }, [isStaff]);
 
   return (
     <div className="dark min-h-screen bg-background text-foreground">
@@ -22,9 +37,25 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             {isClient && <NavItem to="/dashboard" icon={LayoutDashboard} label="Trilha" />}
             {isClient && <NavItem to="/tarefas" icon={ClipboardList} label="Resumo da aula / Tarefa da semana" />}
-            {isClient && <NavItem to="/acompanhamento" icon={HeartPulse} label="Acompanhamento" />}
+            <div className="relative">
+              {isClient ? (
+                <NavItem to="/acompanhamento" icon={HeartPulse} label="Acompanhamento" />
+              ) : (
+                <Link
+                  to="/acompanhamento"
+                  className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+                  activeProps={{ className: "text-foreground font-medium" }}
+                >
+                  <HeartPulse className="h-3.5 w-3.5" /> Acompanhamento
+                  {openTickets > 0 && (
+                    <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white shadow ring-2 ring-background animate-pulse">
+                      {openTickets}
+                    </span>
+                  )}
+                </Link>
+              )}
+            </div>
             <NavItem to="/documentos" icon={FileText} label={isClient ? "Documento / Aula" : "Documentos"} />
-            <NavItem to="/incidentes" icon={AlertTriangle} label="Incidentes" />
             {isClient && <NavItem to="/perfil" icon={UserCircle} label="Perfil" />}
             {isStaff && <NavItem to="/admin" icon={Crown} label="Admin" /> }
           </nav>

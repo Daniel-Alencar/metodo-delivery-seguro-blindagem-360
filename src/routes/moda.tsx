@@ -11,6 +11,7 @@ export const Route = createFileRoute("/moda")({
   }),
   component: () => (
     <AreaTeaser
+      vertical="moda"
       eyebrow="Em construção"
       title="Atacado & Varejo de Moda"
       tagline="Para marcas, atacadistas e varejistas que vivem de coleção, fornecedor e marketplace."

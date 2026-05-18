@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, Sparkles, BellRing, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
+import { LeadCaptureButton } from "@/components/LeadCaptureModal";
 
 export type AreaTeaserProps = {
   eyebrow: string;
@@ -10,6 +11,7 @@ export type AreaTeaserProps = {
   pillars: { title: string; desc: string }[];
   accent: string; // tailwind gradient classes
   glow: string; // oklch
+  vertical: "estetica" | "hof" | "moda";
 };
 
 export function AreaTeaser(props: AreaTeaserProps) {
@@ -42,14 +44,7 @@ export function AreaTeaser(props: AreaTeaserProps) {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background"
-              disabled
-            >
-              <BellRing className="h-4 w-4" />
-              Em breve · Avise-me
-            </button>
+            <LeadCaptureButton vertical={props.vertical} areaName={props.title} />
             <Link
               to="/food-service"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
