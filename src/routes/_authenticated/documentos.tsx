@@ -98,23 +98,25 @@ function DocumentosPage() {
         return (
           <Modal onClose={() => setOpen(null)} title={open.title}>
             {wk && (
-              <div className="mb-4 rounded-md border border-cyan-500/30 bg-cyan-500/5 p-3">
+              <div className="mb-4 shrink-0 rounded-md border border-cyan-500/30 bg-cyan-500/5 p-3">
                 <p className="text-[10px] uppercase tracking-wider text-cyan-200">Aula vinculada · Semana {wk.week_index}</p>
                 <p className="mt-1 text-sm font-medium text-foreground">{wk.title}</p>
                 {wk.summary && <p className="mt-2 text-xs text-muted-foreground">{wk.summary}</p>}
               </div>
             )}
-            {open.description && <p className="text-sm text-muted-foreground">{open.description}</p>}
-            <pre className="mt-4 max-h-[60vh] overflow-auto whitespace-pre-wrap rounded-md border border-border bg-background/60 p-4 text-sm">
-              {open.body || "(documento sem corpo)"}
-            </pre>
+            {open.description && <p className="shrink-0 text-sm text-muted-foreground">{open.description}</p>}
+            <div className="mt-4 flex-1 overflow-auto rounded-md border border-border bg-background/60 p-4">
+              <pre className="whitespace-pre-wrap text-sm leading-relaxed">
+                {open.body || "(documento sem corpo)"}
+              </pre>
+            </div>
           </Modal>
         );
       })()}
 
       {adding && (
         <Modal onClose={() => setAdding(false)} title="Novo documento">
-          <div className="space-y-3">
+          <div className="flex-1 space-y-3 overflow-auto pr-1">
             <Input label="Título" value={form.title} onChange={(v) => setForm({ ...form, title: v })} />
             <Input label="Descrição" value={form.description} onChange={(v) => setForm({ ...form, description: v })} />
             <div>
@@ -162,12 +164,16 @@ function Input({ label, value, onChange }: { label: string; value: string; onCha
 function Modal({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur" onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between">
+      <div
+        className="flex w-full max-w-3xl flex-col rounded-2xl border border-border bg-card p-6"
+        style={{ maxHeight: "min(85vh, 800px)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex shrink-0 items-center justify-between">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">Fechar</button>
         </div>
-        {children}
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       </div>
     </div>
   );
