@@ -112,8 +112,8 @@ function HubPage() {
             Escolha sua área. Ative sua Blindagem 360º.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
-            Um sistema operacional de proteção jurídica e governança aplicada — desenhado para os
-            riscos reais de cada setor.
+            Um sistema operacional de proteção jurídica e governança aplicada — desenhada por
+            equipes altamente especializadas para os riscos reais de cada setor.
           </p>
         </section>
 
