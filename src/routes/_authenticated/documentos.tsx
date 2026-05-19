@@ -83,7 +83,8 @@ function DocumentosPage() {
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {docs.map((d) => (
             <button
-              key={d.id} onClick={() => setOpen(d)}
+              key={d.id}
+              onClick={() => setOpen({ doc: d, mode: d.week_id ? "choose" : "doc" })}
               className="group text-left rounded-xl border border-border bg-card/60 p-6 transition-all hover:-translate-y-0.5 hover:border-foreground/30"
             >
               <FileText className="h-4 w-4 text-muted-foreground" />
@@ -96,20 +97,78 @@ function DocumentosPage() {
       )}
 
       {open && (() => {
-        const wk = open.week_id ? weeks.find((x) => x.id === open.week_id) : null;
-        return (
-          <Modal onClose={() => setOpen(null)} title={open.title}>
-            {wk && (
-              <div className="mb-4 shrink-0 rounded-md border border-cyan-500/30 bg-cyan-500/5 p-3">
-                <p className="text-[10px] uppercase tracking-wider text-cyan-200">Aula vinculada · Semana {wk.week_index}</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{wk.title}</p>
-                {wk.summary && <p className="mt-2 text-xs text-muted-foreground">{wk.summary}</p>}
+        const d = open.doc;
+        const wk = d.week_id ? weeks.find((x) => x.id === d.week_id) : null;
+
+        if (open.mode === "choose") {
+          return (
+            <Modal onClose={() => setOpen(null)} title={d.title}>
+              <p className="shrink-0 text-sm text-muted-foreground">
+                O que você quer abrir agora?
+              </p>
+              <div className="mt-6 grid flex-1 gap-4 sm:grid-cols-2">
+                <button
+                  onClick={() => setOpen({ doc: d, mode: "aula" })}
+                  disabled={!wk}
+                  className="group flex flex-col rounded-xl border border-border bg-background/60 p-6 text-left transition-all hover:-translate-y-0.5 hover:border-cyan-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="text-[10px] uppercase tracking-wider text-cyan-200">Aula</span>
+                  <span className="mt-2 text-base font-semibold">Ver resumo da aula</span>
+                  <span className="mt-2 text-xs text-muted-foreground">
+                    {wk ? `Semana ${wk.week_index} · ${wk.title}` : "Este documento não está vinculado a uma aula."}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setOpen({ doc: d, mode: "doc" })}
+                  className="group flex flex-col rounded-xl border border-border bg-background/60 p-6 text-left transition-all hover:-translate-y-0.5 hover:border-foreground/40"
+                >
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Documento</span>
+                  <span className="mt-2 text-base font-semibold">Ver documento completo</span>
+                  <span className="mt-2 text-xs text-muted-foreground">
+                    Modelo na íntegra para leitura.
+                  </span>
+                </button>
               </div>
+            </Modal>
+          );
+        }
+
+        if (open.mode === "aula" && wk) {
+          return (
+            <Modal onClose={() => setOpen(null)} title={`Semana ${wk.week_index} · ${wk.title}`}>
+              {d.week_id && (
+                <button
+                  onClick={() => setOpen({ doc: d, mode: "choose" })}
+                  className="mb-3 shrink-0 self-start text-xs text-muted-foreground hover:text-foreground"
+                >
+                  ← Voltar
+                </button>
+              )}
+              <div className="flex-1 overflow-auto rounded-md border border-cyan-500/30 bg-cyan-500/5 p-5">
+                <p className="text-[10px] uppercase tracking-wider text-cyan-200">Resumo da aula</p>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
+                  {wk.summary || "(aula sem resumo cadastrado)"}
+                </p>
+              </div>
+            </Modal>
+          );
+        }
+
+        // mode === "doc"
+        return (
+          <Modal onClose={() => setOpen(null)} title={d.title}>
+            {d.week_id && (
+              <button
+                onClick={() => setOpen({ doc: d, mode: "choose" })}
+                className="mb-3 shrink-0 self-start text-xs text-muted-foreground hover:text-foreground"
+              >
+                ← Voltar
+              </button>
             )}
-            {open.description && <p className="shrink-0 text-sm text-muted-foreground">{open.description}</p>}
+            {d.description && <p className="shrink-0 text-sm text-muted-foreground">{d.description}</p>}
             <div className="mt-4 flex-1 overflow-auto rounded-md border border-border bg-background/60 p-4">
               <pre className="whitespace-pre-wrap text-sm leading-relaxed">
-                {open.body || "(documento sem corpo)"}
+                {d.body || "(documento sem corpo)"}
               </pre>
             </div>
           </Modal>
