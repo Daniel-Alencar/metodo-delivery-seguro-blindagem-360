@@ -736,6 +736,10 @@ export type Database = {
         Returns: undefined
       }
       request_archive: { Args: { _enrollment_id: string }; Returns: string }
+      staff_unlock_week: {
+        Args: { _enrollment_id: string; _week_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "mentor" | "cliente"
