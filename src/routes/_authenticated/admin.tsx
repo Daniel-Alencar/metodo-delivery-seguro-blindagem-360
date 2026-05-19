@@ -124,6 +124,30 @@ function AdminPage() {
     else alert("Atendimento registrado.");
   }
 
+  async function unlockNextWeek(enrollmentId: string) {
+    const [{ data: ws }, { data: ps }] = await Promise.all([
+      supabase.from("weeks").select("id, week_index, title, module_id").order("week_index"),
+      supabase.from("week_progress").select("week_id, status").eq("enrollment_id", enrollmentId),
+    ]);
+    const { data: mods } = await supabase.from("modules").select("id, month_index").eq("vertical", "food-service").order("month_index");
+    const moduleOrder = new Map((mods ?? []).map((m, i) => [m.id, i]));
+    const ordered = (ws ?? []).slice().sort((a, b) => {
+      const am = moduleOrder.get(a.module_id) ?? 99;
+      const bm = moduleOrder.get(b.module_id) ?? 99;
+      return am - bm || a.week_index - b.week_index;
+    });
+    const doneIds = new Set((ps ?? []).filter((p) => p.status !== "locked").map((p) => p.week_id));
+    const next = ordered.find((w) => !doneIds.has(w.id));
+    if (!next) { alert("Não há semanas para liberar."); return; }
+    if (!confirm(`Liberar a Semana ${next.week_index} — ${next.title} para este aluno agora?`)) return;
+    const { error } = await supabase.rpc("staff_unlock_week", {
+      _enrollment_id: enrollmentId, _week_id: next.id,
+    });
+    if (error) alert(error.message);
+    else alert(`Semana ${next.week_index} liberada.`);
+  }
+
+
   if (authLoading) return <div className="flex items-center text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   if (!isStaff) {
     return (
@@ -279,16 +303,23 @@ function AdminPage() {
                           <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
                           <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
                           <td className="px-4 py-3 text-right">
-                            {e.status !== "active" && (
-                              <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
-                                Ativar
-                              </button>
-                            )}
-                            {e.status === "active" && (
-                              <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
-                                Pausar
-                              </button>
-                            )}
+                            <div className="flex flex-wrap items-center justify-end gap-2">
+                              {e.status !== "active" && (
+                                <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
+                                  Ativar
+                                </button>
+                              )}
+                              {e.status === "active" && (
+                                <>
+                                  <button onClick={() => unlockNextWeek(e.id)} className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20">
+                                    Liberar próxima semana
+                                  </button>
+                                  <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
+                                    Pausar
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
