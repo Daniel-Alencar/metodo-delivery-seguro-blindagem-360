@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/documentos")({
 type Doc = { id: string; title: string; description: string | null; body: string | null; version: string; module_id: string | null; week_id: string | null };
 type Module = { id: string; month_index: number; title: string };
 type Week = { id: string; week_index: number; title: string; summary: string | null };
+type OpenView = { doc: Doc; mode: "choose" | "aula" | "doc" };
+
 
 function DocumentosPage() {
   const { isStaff } = useAuth();
@@ -19,7 +21,7 @@ function DocumentosPage() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
-  const [open, setOpen] = useState<Doc | null>(null);
+  const [open, setOpen] = useState<OpenView | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", body: "", module_id: "" });
 
