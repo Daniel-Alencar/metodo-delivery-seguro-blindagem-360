@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_meeting_notes: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          enrollment_id: string
+          id: string
+          updated_at: string
+          week_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          enrollment_id: string
+          id?: string
+          updated_at?: string
+          week_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          enrollment_id?: string
+          id?: string
+          updated_at?: string
+          week_id?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           body: string | null
@@ -736,6 +766,14 @@ export type Database = {
         Returns: undefined
       }
       request_archive: { Args: { _enrollment_id: string }; Returns: string }
+      staff_finish_meeting: {
+        Args: {
+          _enrollment_id: string
+          _private_notes?: string
+          _week_id: string
+        }
+        Returns: undefined
+      }
       staff_unlock_week: {
         Args: { _enrollment_id: string; _week_id: string }
         Returns: undefined
