@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History, BarChart3, BookOpen, Users, FileText, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History, BarChart3, BookOpen, Users, FileText, ChevronDown, ChevronRight, X, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
