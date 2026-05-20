@@ -315,6 +315,23 @@ function AdminPage() {
                               )}
                               {e.status === "active" && (
                                 <>
+                                  <select
+                                    defaultValue=""
+                                    onChange={(ev) => {
+                                      if (ev.target.value) {
+                                        navigate({ to: "/documentos", search: { week: ev.target.value, enrollment: e.id } });
+                                      }
+                                    }}
+                                    className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200"
+                                    title="Abrir encontro para finalizar / observações"
+                                  >
+                                    <option value="">Encontros…</option>
+                                    {allWeeks.map((w) => (
+                                      <option key={w.id} value={w.id}>
+                                        Encontro {w.week_index} — {w.title}
+                                      </option>
+                                    ))}
+                                  </select>
                                   <button onClick={() => unlockNextWeek(e.id)} className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20">
                                     Liberar próxima semana
                                   </button>
