@@ -45,13 +45,15 @@ function AdminPage() {
 
   async function load() {
     setLoading(true);
-    const [{ data: e }, { data: p }] = await Promise.all([
+    const [{ data: e }, { data: p }, { data: ws }] = await Promise.all([
       supabase.from("enrollments").select("*").order("created_at", { ascending: false }),
       supabase.from("week_progress").select("*").eq("status", "submitted"),
+      supabase.from("weeks").select("id, week_index, title, module_id").order("week_index"),
     ]);
     const enr = (e ?? []) as EnrollmentRow[];
     setEnrollments(enr);
     setPending((p ?? []) as ProgressRow[]);
+    setAllWeeks((ws ?? []) as { id: string; week_index: number; title: string; module_id: string }[]);
     const ids = Array.from(new Set(enr.map((x) => x.user_id)));
     if (ids.length) {
       const { data: profs } = await supabase
