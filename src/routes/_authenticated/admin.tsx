@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History, BarChart3, BookOpen, Users, FileText, ChevronDown, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +26,11 @@ function AdminPage() {
   const { isAdminView, canSwitch } = useViewMode();
   // Super admin sections only show when in admin view (or user is pure admin without mentor role)
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
+  const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
   const [profilesById, setProfilesById] = useState<Record<string, ProfileLite>>({});
+  const [allWeeks, setAllWeeks] = useState<{ id: string; week_index: number; title: string; module_id: string }[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
@@ -43,13 +45,15 @@ function AdminPage() {
 
   async function load() {
     setLoading(true);
-    const [{ data: e }, { data: p }] = await Promise.all([
+    const [{ data: e }, { data: p }, { data: ws }] = await Promise.all([
       supabase.from("enrollments").select("*").order("created_at", { ascending: false }),
       supabase.from("week_progress").select("*").eq("status", "submitted"),
+      supabase.from("weeks").select("id, week_index, title, module_id").order("week_index"),
     ]);
     const enr = (e ?? []) as EnrollmentRow[];
     setEnrollments(enr);
     setPending((p ?? []) as ProgressRow[]);
+    setAllWeeks((ws ?? []) as { id: string; week_index: number; title: string; module_id: string }[]);
     const ids = Array.from(new Set(enr.map((x) => x.user_id)));
     if (ids.length) {
       const { data: profs } = await supabase
@@ -311,6 +315,23 @@ function AdminPage() {
                               )}
                               {e.status === "active" && (
                                 <>
+                                  <select
+                                    defaultValue=""
+                                    onChange={(ev) => {
+                                      if (ev.target.value) {
+                                        navigate({ to: "/documentos", search: { week: ev.target.value, enrollment: e.id } });
+                                      }
+                                    }}
+                                    className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200"
+                                    title="Abrir encontro para finalizar / observações"
+                                  >
+                                    <option value="">Encontros…</option>
+                                    {allWeeks.map((w) => (
+                                      <option key={w.id} value={w.id}>
+                                        Encontro {w.week_index} — {w.title}
+                                      </option>
+                                    ))}
+                                  </select>
                                   <button onClick={() => unlockNextWeek(e.id)} className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20">
                                     Liberar próxima semana
                                   </button>

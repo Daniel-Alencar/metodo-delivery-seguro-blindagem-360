@@ -70,14 +70,17 @@ function DashboardPage() {
     return progress.find((p) => p.week_id === weekId);
   }
 
-  function isUnlocked(idx: number): boolean {
+  // TEST MODE: all weeks unlocked for active/graduated/archiving enrollments
+  // To re-enable the 7-day lock + prior approval gate, restore the commented block below.
+  function isUnlocked(_idx: number): boolean {
     if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) return false;
-    if (idx === 0) return true;
-    const prev = orderedWeeks[idx - 1];
-    const prevProg = getProgress(prev.id);
-    if (!prevProg || prevProg.status !== "approved" || !prevProg.approved_at) return false;
-    const days = (Date.now() - new Date(prevProg.approved_at).getTime()) / 86_400_000;
-    return days >= UNLOCK_DAYS;
+    return true;
+    // const prev = orderedWeeks[_idx - 1];
+    // if (_idx === 0) return true;
+    // const prevProg = getProgress(prev.id);
+    // if (!prevProg || prevProg.status !== "approved" || !prevProg.approved_at) return false;
+    // const days = (Date.now() - new Date(prevProg.approved_at).getTime()) / 86_400_000;
+    // return days >= UNLOCK_DAYS;
   }
 
   async function startWeek(weekId: string) {
@@ -256,6 +259,7 @@ function DashboardPage() {
                       {(prog || unlocked) && docCounts[w.id] > 0 && (
                         <Link
                           to="/documentos"
+                          search={{ week: w.id }}
                           className="mt-2 inline-flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
                         >
                           <FileText className="h-3 w-3" /> {docCounts[w.id]} modelo{docCounts[w.id] === 1 ? "" : "s"} liberado{docCounts[w.id] === 1 ? "" : "s"}
@@ -289,8 +293,9 @@ function DashboardPage() {
                           <span className="text-amber-300">Em análise pelo mentor</span>
                         )}
                         {prog?.status === "approved" && prog.approved_at && (
-                          <span className="text-emerald-300">
-                            Aprovado em {new Date(prog.approved_at).toLocaleDateString("pt-BR")}
+                          <span className="inline-flex items-center gap-1 text-emerald-300">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Encontro finalizado em {new Date(prog.approved_at).toLocaleDateString("pt-BR")}
                           </span>
                         )}
                       </div>

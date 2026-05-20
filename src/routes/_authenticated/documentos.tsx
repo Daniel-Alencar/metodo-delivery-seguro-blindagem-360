@@ -1,11 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { FileText, Loader2 } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, FileText, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
+type DocsSearch = { week?: string; enrollment?: string };
+
 export const Route = createFileRoute("/_authenticated/documentos")({
   head: () => ({ meta: [{ title: "Documentos Vivos — Blindagem 360º" }] }),
+  validateSearch: (s: Record<string, unknown>): DocsSearch => ({
+    week: typeof s.week === "string" ? s.week : undefined,
+    enrollment: typeof s.enrollment === "string" ? s.enrollment : undefined,
+  }),
   component: DocumentosPage,
 });
 
@@ -13,10 +19,18 @@ type Doc = { id: string; title: string; description: string | null; body: string
 type Module = { id: string; month_index: number; title: string };
 type Week = { id: string; week_index: number; title: string; summary: string | null };
 type OpenView = { doc: Doc; mode: "choose" | "aula" | "doc" };
+type Progress = { id: string; enrollment_id: string; week_id: string; status: string; approved_at: string | null };
+type MeetingNote = { id: string; enrollment_id: string; week_id: string; body: string; updated_at: string };
+type EnrollmentLite = { id: string; user_id: string; full_name?: string | null; company_name?: string | null };
 
 
 function DocumentosPage() {
-  const { isStaff } = useAuth();
+  const { isStaff, user } = useAuth();
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const weekFilter = search.week;
+  const enrollmentParam = search.enrollment;
+
   const [loading, setLoading] = useState(true);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
@@ -24,6 +38,16 @@ function DocumentosPage() {
   const [open, setOpen] = useState<OpenView | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", body: "", module_id: "" });
+
+  // Meeting state (per week)
+  const [myEnrollmentId, setMyEnrollmentId] = useState<string | null>(null);
+  const [progress, setProgress] = useState<Progress | null>(null);
+  const [privateNote, setPrivateNote] = useState<MeetingNote | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [staffEnrollments, setStaffEnrollments] = useState<EnrollmentLite[]>([]);
+  const [savingMeeting, setSavingMeeting] = useState(false);
+
+  const activeEnrollmentId = enrollmentParam ?? myEnrollmentId;
 
   async function load() {
     setLoading(true);
@@ -40,6 +64,85 @@ function DocumentosPage() {
 
   useEffect(() => { load(); }, []);
 
+  // Resolve client's own enrollment id (for concluded badge)
+  useEffect(() => {
+    if (!user || isStaff) return;
+    supabase.from("enrollments").select("id").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setMyEnrollmentId((data as { id: string } | null)?.id ?? null));
+  }, [user, isStaff]);
+
+  // Staff: load enrollments list (for picker when no ?enrollment=)
+  useEffect(() => {
+    if (!isStaff || !weekFilter || enrollmentParam) return;
+    (async () => {
+      const { data: es } = await supabase.from("enrollments")
+        .select("id, user_id").order("created_at", { ascending: false });
+      const list = (es ?? []) as { id: string; user_id: string }[];
+      const ids = list.map((e) => e.user_id);
+      const { data: ps } = ids.length
+        ? await supabase.from("profiles").select("id, full_name, company_name").in("id", ids)
+        : { data: [] as { id: string; full_name: string | null; company_name: string | null }[] };
+      const byId = new Map((ps ?? []).map((p) => [p.id, p]));
+      setStaffEnrollments(list.map((e) => ({
+        ...e,
+        full_name: byId.get(e.user_id)?.full_name ?? null,
+        company_name: byId.get(e.user_id)?.company_name ?? null,
+      })));
+    })();
+  }, [isStaff, weekFilter, enrollmentParam]);
+
+  // Load progress + private notes for the selected (week, enrollment)
+  useEffect(() => {
+    if (!weekFilter || !activeEnrollmentId) { setProgress(null); setPrivateNote(null); setNoteDraft(""); return; }
+    (async () => {
+      const { data: p } = await supabase.from("week_progress")
+        .select("id, enrollment_id, week_id, status, approved_at")
+        .eq("enrollment_id", activeEnrollmentId).eq("week_id", weekFilter).maybeSingle();
+      setProgress(p as Progress | null);
+      if (isStaff) {
+        const { data: n } = await supabase.from("class_meeting_notes")
+          .select("id, enrollment_id, week_id, body, updated_at")
+          .eq("enrollment_id", activeEnrollmentId).eq("week_id", weekFilter).maybeSingle();
+        setPrivateNote(n as MeetingNote | null);
+        setNoteDraft((n as MeetingNote | null)?.body ?? "");
+      }
+    })();
+  }, [weekFilter, activeEnrollmentId, isStaff]);
+
+  async function finishMeeting() {
+    if (!weekFilter || !activeEnrollmentId) return;
+    setSavingMeeting(true);
+    const { error } = await supabase.rpc("staff_finish_meeting", {
+      _enrollment_id: activeEnrollmentId, _week_id: weekFilter, _private_notes: noteDraft || undefined,
+    });
+    setSavingMeeting(false);
+    if (error) { alert("Erro ao finalizar encontro: " + error.message); return; }
+    // refresh
+    const { data: p } = await supabase.from("week_progress")
+      .select("id, enrollment_id, week_id, status, approved_at")
+      .eq("enrollment_id", activeEnrollmentId).eq("week_id", weekFilter).maybeSingle();
+    setProgress(p as Progress | null);
+  }
+
+  async function saveNoteOnly() {
+    if (!weekFilter || !activeEnrollmentId) return;
+    setSavingMeeting(true);
+    const { error } = await supabase.from("class_meeting_notes").upsert({
+      enrollment_id: activeEnrollmentId, week_id: weekFilter, body: noteDraft, author_id: user?.id ?? null,
+    }, { onConflict: "enrollment_id,week_id" });
+    setSavingMeeting(false);
+    if (error) alert("Erro ao salvar observação: " + error.message);
+    else setPrivateNote({ id: "", enrollment_id: activeEnrollmentId, week_id: weekFilter, body: noteDraft, updated_at: new Date().toISOString() });
+  }
+
+  const filteredDocs = useMemo(
+    () => weekFilter ? docs.filter((d) => d.week_id === weekFilter) : docs,
+    [docs, weekFilter]
+  );
+  const selectedWeek = weekFilter ? weeks.find((w) => w.id === weekFilter) ?? null : null;
+
+
+
   async function addDoc() {
     if (!form.title) return;
     await supabase.from("documents").insert({
@@ -55,17 +158,34 @@ function DocumentosPage() {
     return <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   }
 
+  const selectedEnrollmentLabel = (() => {
+    if (!activeEnrollmentId) return null;
+    const e = staffEnrollments.find((x) => x.id === activeEnrollmentId);
+    return e ? (e.company_name || e.full_name || e.user_id.slice(0, 8)) : null;
+  })();
+
   return (
     <div>
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Biblioteca</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documento / Aula</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo.
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {selectedWeek ? `Encontro ${selectedWeek.week_index}` : "Biblioteca"}
           </p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">
+            {selectedWeek ? selectedWeek.title : "Documento / Aula"}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            {selectedWeek
+              ? `Modelos liberados neste encontro${selectedEnrollmentLabel ? ` · ${selectedEnrollmentLabel}` : ""}.`
+              : "Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo."}
+          </p>
+          {selectedWeek && (
+            <Link to="/documentos" search={{}} className="mt-3 inline-block text-xs text-cyan-300 hover:text-cyan-200">
+              ← Ver todos os documentos
+            </Link>
+          )}
         </div>
-        {isStaff && (
+        {isStaff && !selectedWeek && (
           <button
             onClick={() => setAdding(true)}
             className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background"
@@ -75,13 +195,37 @@ function DocumentosPage() {
         )}
       </div>
 
-      {docs.length === 0 ? (
+      {isStaff && weekFilter && !enrollmentParam && (
+        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+          <p className="text-xs uppercase tracking-wider text-amber-200">Selecionar aluno</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Para finalizar o encontro e salvar observações, escolha o aluno:
+          </p>
+          <select
+            className="mt-3 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm"
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value) navigate({ to: "/documentos", search: { week: weekFilter, enrollment: e.target.value } });
+            }}
+          >
+            <option value="">— selecione —</option>
+            {staffEnrollments.map((en) => (
+              <option key={en.id} value={en.id}>
+                {(en.company_name || en.full_name || "—")} · {en.user_id.slice(0, 8)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {filteredDocs.length === 0 ? (
         <div className="mt-10 rounded-xl border border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
-          Nenhum documento publicado ainda.{isStaff && " Use o botão acima para adicionar o primeiro."}
+          {weekFilter ? "Nenhum modelo vinculado a este encontro ainda." : "Nenhum documento publicado ainda."}
+          {isStaff && !weekFilter && " Use o botão acima para adicionar o primeiro."}
         </div>
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {docs.map((d) => (
+          {filteredDocs.map((d) => (
             <button
               key={d.id}
               onClick={() => setOpen({ doc: d, mode: d.week_id ? "choose" : "doc" })}
@@ -93,6 +237,68 @@ function DocumentosPage() {
               <p className="mt-4 text-[11px] uppercase tracking-wider text-muted-foreground">{d.version}</p>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Footer do encontro: marcação pública + observação privada do mentor */}
+      {weekFilter && activeEnrollmentId && (
+        <div className="mt-8 space-y-4">
+          {/* Linha visível para TODOS: status do encontro */}
+          <div className="rounded-xl border border-border bg-card/60 p-5">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Status do encontro</p>
+            {progress?.status === "approved" && progress.approved_at ? (
+              <p className="mt-2 inline-flex items-center gap-2 text-sm text-emerald-300">
+                <CheckCircle2 className="h-4 w-4" />
+                Encontro concluído em {new Date(progress.approved_at).toLocaleDateString("pt-BR")}
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isStaff ? "Encontro ainda não finalizado." : "Aguardando o mentor concluir este encontro."}
+              </p>
+            )}
+          </div>
+
+          {/* Bloco APENAS para mentor/admin: observações privadas + ação de finalizar */}
+          {isStaff && (
+            <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-5">
+              <p className="text-xs uppercase tracking-wider text-cyan-200">Apenas mentor / admin</p>
+              <label className="mt-3 block text-xs text-muted-foreground">Observações do encontro (privadas)</label>
+              <textarea
+                rows={4}
+                value={noteDraft}
+                onChange={(e) => setNoteDraft(e.target.value)}
+                placeholder="Pontos discutidos, próximos passos, alertas internos..."
+                className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm"
+              />
+              {privateNote?.updated_at && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Última atualização: {new Date(privateNote.updated_at).toLocaleString("pt-BR")}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {progress?.status !== "approved" ? (
+                  <button
+                    disabled={savingMeeting}
+                    onClick={finishMeeting}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs font-medium text-emerald-950 disabled:opacity-60"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Marcar encontro como finalizado
+                  </button>
+                ) : (
+                  <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-200">
+                    ✓ Finalizado
+                  </span>
+                )}
+                <button
+                  disabled={savingMeeting}
+                  onClick={saveNoteOnly}
+                  className="rounded-full border border-border bg-background/60 px-4 py-2 text-xs disabled:opacity-60"
+                >
+                  Salvar observação
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
