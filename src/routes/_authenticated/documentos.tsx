@@ -113,7 +113,7 @@ function DocumentosPage() {
     if (!weekFilter || !activeEnrollmentId) return;
     setSavingMeeting(true);
     const { error } = await supabase.rpc("staff_finish_meeting", {
-      _enrollment_id: activeEnrollmentId, _week_id: weekFilter, _private_notes: noteDraft || null,
+      _enrollment_id: activeEnrollmentId, _week_id: weekFilter, _private_notes: noteDraft || undefined,
     });
     setSavingMeeting(false);
     if (error) { alert("Erro ao finalizar encontro: " + error.message); return; }
