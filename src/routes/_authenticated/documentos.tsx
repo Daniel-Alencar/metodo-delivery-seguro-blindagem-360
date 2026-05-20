@@ -158,17 +158,34 @@ function DocumentosPage() {
     return <div className="flex items-center justify-center py-20 text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
   }
 
+  const selectedEnrollmentLabel = (() => {
+    if (!activeEnrollmentId) return null;
+    const e = staffEnrollments.find((x) => x.id === activeEnrollmentId);
+    return e ? (e.company_name || e.full_name || e.user_id.slice(0, 8)) : null;
+  })();
+
   return (
     <div>
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Biblioteca</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Documento / Aula</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo.
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {selectedWeek ? `Encontro ${selectedWeek.week_index}` : "Biblioteca"}
           </p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">
+            {selectedWeek ? selectedWeek.title : "Documento / Aula"}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            {selectedWeek
+              ? `Modelos liberados neste encontro${selectedEnrollmentLabel ? ` · ${selectedEnrollmentLabel}` : ""}.`
+              : "Modelos de documentos vinculados às aulas. Clique em um modelo para ver o resumo da aula e o conteúdo completo."}
+          </p>
+          {selectedWeek && (
+            <Link to="/documentos" search={{}} className="mt-3 inline-block text-xs text-cyan-300 hover:text-cyan-200">
+              ← Ver todos os documentos
+            </Link>
+          )}
         </div>
-        {isStaff && (
+        {isStaff && !selectedWeek && (
           <button
             onClick={() => setAdding(true)}
             className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background"
@@ -178,13 +195,37 @@ function DocumentosPage() {
         )}
       </div>
 
-      {docs.length === 0 ? (
+      {isStaff && weekFilter && !enrollmentParam && (
+        <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+          <p className="text-xs uppercase tracking-wider text-amber-200">Selecionar aluno</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Para finalizar o encontro e salvar observações, escolha o aluno:
+          </p>
+          <select
+            className="mt-3 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm"
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value) navigate({ to: "/documentos", search: { week: weekFilter, enrollment: e.target.value } });
+            }}
+          >
+            <option value="">— selecione —</option>
+            {staffEnrollments.map((en) => (
+              <option key={en.id} value={en.id}>
+                {(en.company_name || en.full_name || "—")} · {en.user_id.slice(0, 8)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {filteredDocs.length === 0 ? (
         <div className="mt-10 rounded-xl border border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
-          Nenhum documento publicado ainda.{isStaff && " Use o botão acima para adicionar o primeiro."}
+          {weekFilter ? "Nenhum modelo vinculado a este encontro ainda." : "Nenhum documento publicado ainda."}
+          {isStaff && !weekFilter && " Use o botão acima para adicionar o primeiro."}
         </div>
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {docs.map((d) => (
+          {filteredDocs.map((d) => (
             <button
               key={d.id}
               onClick={() => setOpen({ doc: d, mode: d.week_id ? "choose" : "doc" })}
@@ -196,6 +237,68 @@ function DocumentosPage() {
               <p className="mt-4 text-[11px] uppercase tracking-wider text-muted-foreground">{d.version}</p>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Footer do encontro: marcação pública + observação privada do mentor */}
+      {weekFilter && activeEnrollmentId && (
+        <div className="mt-8 space-y-4">
+          {/* Linha visível para TODOS: status do encontro */}
+          <div className="rounded-xl border border-border bg-card/60 p-5">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Status do encontro</p>
+            {progress?.status === "approved" && progress.approved_at ? (
+              <p className="mt-2 inline-flex items-center gap-2 text-sm text-emerald-300">
+                <CheckCircle2 className="h-4 w-4" />
+                Encontro concluído em {new Date(progress.approved_at).toLocaleDateString("pt-BR")}
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isStaff ? "Encontro ainda não finalizado." : "Aguardando o mentor concluir este encontro."}
+              </p>
+            )}
+          </div>
+
+          {/* Bloco APENAS para mentor/admin: observações privadas + ação de finalizar */}
+          {isStaff && (
+            <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-5">
+              <p className="text-xs uppercase tracking-wider text-cyan-200">Apenas mentor / admin</p>
+              <label className="mt-3 block text-xs text-muted-foreground">Observações do encontro (privadas)</label>
+              <textarea
+                rows={4}
+                value={noteDraft}
+                onChange={(e) => setNoteDraft(e.target.value)}
+                placeholder="Pontos discutidos, próximos passos, alertas internos..."
+                className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm"
+              />
+              {privateNote?.updated_at && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Última atualização: {new Date(privateNote.updated_at).toLocaleString("pt-BR")}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {progress?.status !== "approved" ? (
+                  <button
+                    disabled={savingMeeting}
+                    onClick={finishMeeting}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs font-medium text-emerald-950 disabled:opacity-60"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Marcar encontro como finalizado
+                  </button>
+                ) : (
+                  <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-200">
+                    ✓ Finalizado
+                  </span>
+                )}
+                <button
+                  disabled={savingMeeting}
+                  onClick={saveNoteOnly}
+                  className="rounded-full border border-border bg-background/60 px-4 py-2 text-xs disabled:opacity-60"
+                >
+                  Salvar observação
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
