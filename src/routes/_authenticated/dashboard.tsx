@@ -259,6 +259,7 @@ function DashboardPage() {
                       {(prog || unlocked) && docCounts[w.id] > 0 && (
                         <Link
                           to="/documentos"
+                          search={{ week: w.id }}
                           className="mt-2 inline-flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
                         >
                           <FileText className="h-3 w-3" /> {docCounts[w.id]} modelo{docCounts[w.id] === 1 ? "" : "s"} liberado{docCounts[w.id] === 1 ? "" : "s"}
@@ -292,8 +293,9 @@ function DashboardPage() {
                           <span className="text-amber-300">Em análise pelo mentor</span>
                         )}
                         {prog?.status === "approved" && prog.approved_at && (
-                          <span className="text-emerald-300">
-                            Aprovado em {new Date(prog.approved_at).toLocaleDateString("pt-BR")}
+                          <span className="inline-flex items-center gap-1 text-emerald-300">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Encontro finalizado em {new Date(prog.approved_at).toLocaleDateString("pt-BR")}
                           </span>
                         )}
                       </div>
