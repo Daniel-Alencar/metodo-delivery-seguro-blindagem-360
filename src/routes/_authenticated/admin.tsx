@@ -26,9 +26,11 @@ function AdminPage() {
   const { isAdminView, canSwitch } = useViewMode();
   // Super admin sections only show when in admin view (or user is pure admin without mentor role)
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
+  const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [pending, setPending] = useState<ProgressRow[]>([]);
   const [profilesById, setProfilesById] = useState<Record<string, ProfileLite>>({});
+  const [allWeeks, setAllWeeks] = useState<{ id: string; week_index: number; title: string; module_id: string }[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [searchResult, setSearchResult] = useState<{ user_id: string; email: string; full_name: string } | null>(null);
