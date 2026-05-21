@@ -34,10 +34,13 @@ function DashboardPage() {
 
   async function load() {
     setLoading(true);
-    const [{ data: m }, { data: w }, { data: e }, { data: docs }] = await Promise.all([
-      supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
+    const { data: e } = await supabase
+      .from("enrollments").select("*").eq("user_id", user!.id)
+      .order("created_at", { ascending: false }).maybeSingle();
+    const vertical = (e as { vertical?: string } | null)?.vertical ?? "food-service";
+    const [{ data: m }, { data: w }, { data: docs }] = await Promise.all([
+      supabase.from("modules").select("*").eq("vertical", vertical).order("month_index"),
       supabase.from("weeks").select("*").order("week_index"),
-      supabase.from("enrollments").select("*").eq("user_id", user!.id).eq("vertical", "food-service").maybeSingle(),
       supabase.from("documents").select("week_id").not("week_id", "is", null),
     ]);
     setModules(m ?? []);

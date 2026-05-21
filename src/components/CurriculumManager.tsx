@@ -14,6 +14,7 @@ type Doc = {
 
 export function CurriculumManager() {
   const [loading, setLoading] = useState(true);
+  const [vertical, setVertical] = useState<"food-service" | "pet-shop">("food-service");
   const [modules, setModules] = useState<Module[]>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [docs, setDocs] = useState<Doc[]>([]);
@@ -26,17 +27,23 @@ export function CurriculumManager() {
 
   async function load() {
     setLoading(true);
-    const [{ data: m }, { data: w }, { data: d }] = await Promise.all([
-      supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
-      supabase.from("weeks").select("*").order("week_index"),
-      supabase.from("documents").select("*").order("title"),
+    const { data: m } = await supabase.from("modules").select("*").eq("vertical", vertical).order("month_index");
+    const modList = (m ?? []) as Module[];
+    const modIds = modList.map((x) => x.id);
+    const [{ data: w }, { data: d }] = await Promise.all([
+      modIds.length
+        ? supabase.from("weeks").select("*").in("module_id", modIds).order("week_index")
+        : Promise.resolve({ data: [] }),
+      modIds.length
+        ? supabase.from("documents").select("*").in("module_id", modIds).order("title")
+        : Promise.resolve({ data: [] }),
     ]);
-    setModules((m ?? []) as Module[]);
+    setModules(modList);
     setWeeks((w ?? []) as Week[]);
     setDocs((d ?? []) as Doc[]);
     setLoading(false);
   }
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [vertical]);
 
   async function saveWeek(w: Week) {
     setSavingWeek(w.id);
@@ -79,6 +86,17 @@ export function CurriculumManager() {
 
   return (
     <div className="space-y-8">
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-card/40 p-3">
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Vertical</span>
+        <select
+          value={vertical}
+          onChange={(e) => setVertical(e.target.value as "food-service" | "pet-shop")}
+          className="rounded-md border border-border bg-background/60 px-3 py-1.5 text-sm"
+        >
+          <option value="food-service">Food Service</option>
+          <option value="pet-shop">Pet Shop</option>
+        </select>
+      </div>
       {modules.map((m) => {
         const monthWeeks = weeks.filter((w) => w.module_id === m.id).sort((a, b) => a.week_index - b.week_index);
         return (
