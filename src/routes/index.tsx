@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, Sparkles, Stethoscope, ShoppingBag, ArrowUpRight } from "lucide-react";
+import { ShieldCheck, PawPrint, ArrowUpRight } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/")({
@@ -46,37 +46,15 @@ const verticals: Vertical[] = [
     accent: "from-orange-500/20 via-red-500/10 to-transparent",
   },
   {
-    to: "/estetica",
-    eyebrow: "Em construção",
-    title: "Estética",
+    to: "/petshop",
+    eyebrow: "Método Pet Shop Seguro™",
+    title: "Pet Shop",
     description:
-      "Clínicas, profissionais e centros de estética. Protocolos, contratos e proteção operacional dedicada.",
-    status: "soon",
-    icon: Sparkles,
-    glow: "oklch(0.78 0.16 330)",
-    accent: "from-pink-500/20 via-fuchsia-500/10 to-transparent",
-  },
-  {
-    to: "/hof",
-    eyebrow: "Em construção",
-    title: "HOF — Harmonização Orofacial",
-    description:
-      "Procedimentos médicos estéticos e harmonização. Blindagem regulatória, técnica e probatória.",
-    status: "soon",
-    icon: Stethoscope,
-    glow: "oklch(0.78 0.16 200)",
-    accent: "from-cyan-500/20 via-sky-500/10 to-transparent",
-  },
-  {
-    to: "/moda",
-    eyebrow: "Em construção",
-    title: "Atacado & Varejo de Moda",
-    description:
-      "Marcas, atacadistas e varejistas de moda. Contratos, fornecedores, marketplace e reputação.",
-    status: "soon",
-    icon: ShoppingBag,
-    glow: "oklch(0.78 0.17 280)",
-    accent: "from-violet-500/20 via-indigo-500/10 to-transparent",
+      "Pet shops, banho & tosa, hospedagem e clínicas veterinárias. Societária, trabalhista, consumerista e vigilância aplicadas.",
+    status: "available",
+    icon: PawPrint,
+    glow: "oklch(0.78 0.15 200)",
+    accent: "from-cyan-500/20 via-emerald-500/10 to-transparent",
   },
 ];
 

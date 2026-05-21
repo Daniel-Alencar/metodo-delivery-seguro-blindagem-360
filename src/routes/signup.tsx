@@ -4,13 +4,19 @@ import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 
+type SignupSearch = { vertical?: string };
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Criar acesso — Blindagem 360º" }] }),
+  validateSearch: (s: Record<string, unknown>): SignupSearch => ({
+    vertical: typeof s.vertical === "string" && (s.vertical === "pet-shop" || s.vertical === "food-service") ? s.vertical : undefined,
+  }),
   component: SignupPage,
 });
 
 function SignupPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const chosenVertical = search.vertical ?? "food-service";
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -65,7 +71,7 @@ function SignupPage() {
     if (data.session) {
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
-        vertical: "food-service",
+        vertical: chosenVertical,
         status: "pending",
       });
       navigate({ to: "/dashboard" });

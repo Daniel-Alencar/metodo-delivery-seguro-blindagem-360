@@ -808,6 +808,7 @@ export type Database = {
         | "mentor_revoked"
         | "archive_requested"
         | "archive_cancelled"
+        | "content_edited"
       ticket_status: "open" | "answered" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
@@ -967,6 +968,7 @@ export const Constants = {
         "mentor_revoked",
         "archive_requested",
         "archive_cancelled",
+        "content_edited",
       ],
       ticket_status: ["open", "answered", "closed"],
       week_status: ["locked", "in_progress", "submitted", "approved"],

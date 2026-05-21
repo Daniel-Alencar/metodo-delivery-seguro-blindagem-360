@@ -210,11 +210,9 @@ function AdminPage() {
               <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Equipe
             </TabsTrigger>
           )}
-          {isAdmin && (
-            <TabsTrigger value="curriculo" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
-              <GraduationCap className="mr-1.5 h-3.5 w-3.5" /> Currículo
-            </TabsTrigger>
-          )}
+          <TabsTrigger value="curriculo" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
+            <GraduationCap className="mr-1.5 h-3.5 w-3.5" /> Currículo
+          </TabsTrigger>
           {isAdmin && (
             <TabsTrigger value="acompanhamento" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
               <HeartPulse className="mr-1.5 h-3.5 w-3.5" /> Acompanhamento
