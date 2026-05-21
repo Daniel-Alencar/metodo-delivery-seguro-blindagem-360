@@ -13,6 +13,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as PetshopRouteImport } from './routes/petshop'
 import { Route as ModaRouteImport } from './routes/moda'
 import { Route as ManualImpressaoRouteImport } from './routes/manual-impressao'
 import { Route as ManualRouteImport } from './routes/manual'
@@ -51,6 +52,11 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PetshopRoute = PetshopRouteImport.update({
+  id: '/petshop',
+  path: '/petshop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModaRoute = ModaRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
     | '/signup'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
     | '/signup'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
     | '/signup'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   ManualRoute: typeof ManualRoute
   ManualImpressaoRoute: typeof ManualImpressaoRoute
   ModaRoute: typeof ModaRoute
+  PetshopRoute: typeof PetshopRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SignupRoute: typeof SignupRoute
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/petshop': {
+      id: '/petshop'
+      path: '/petshop'
+      fullPath: '/petshop'
+      preLoaderRoute: typeof PetshopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moda': {
@@ -520,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManualRoute: ManualRoute,
   ManualImpressaoRoute: ManualImpressaoRoute,
   ModaRoute: ModaRoute,
+  PetshopRoute: PetshopRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SignupRoute: SignupRoute,
@@ -529,3 +550,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
