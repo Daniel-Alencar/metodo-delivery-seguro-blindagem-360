@@ -15,6 +15,8 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const chosenVertical = search.vertical ?? "food-service";
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -69,7 +71,7 @@ function SignupPage() {
     if (data.session) {
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
-        vertical: Route.useSearch().vertical ?? "food-service",
+        vertical: chosenVertical,
         status: "pending",
       });
       navigate({ to: "/dashboard" });
