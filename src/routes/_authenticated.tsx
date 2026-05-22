@@ -48,6 +48,16 @@ function AuthenticatedLayout() {
     }
   }, [loading, needsChoice, location.pathname, navigate]);
 
+  // Staff (admin/mentor) must pick an area (vertical) before entering /admin
+  useEffect(() => {
+    if (loading || needsChoice) return;
+    if (!isStaff) return;
+    if (!needsArea) return;
+    if (location.pathname.startsWith("/escolher-area") || location.pathname.startsWith("/escolher-perfil")) return;
+    navigate({ to: "/escolher-area" });
+  }, [loading, needsChoice, needsArea, isStaff, location.pathname, navigate]);
+
+
   if (loading || !user || checking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
