@@ -51,14 +51,25 @@ function DocumentosPage() {
 
   async function load() {
     setLoading(true);
-    const [{ data: d }, { data: m }, { data: w }] = await Promise.all([
-      supabase.from("documents").select("*").order("created_at", { ascending: false }),
-      supabase.from("modules").select("id, month_index, title").eq("vertical", "food-service").order("month_index"),
-      supabase.from("weeks").select("id, week_index, title, summary").order("week_index"),
+    // Resolve vertical: client = own enrollment; staff = activeVertical sessionStorage; fallback food-service
+    let vertical: string = "food-service";
+    if (isStaff) {
+      const v = typeof window !== "undefined" ? sessionStorage.getItem("activeVertical") : null;
+      if (v === "food-service" || v === "pet-shop") vertical = v;
+    } else if (user) {
+      const { data: e } = await supabase.from("enrollments").select("vertical").eq("user_id", user.id).maybeSingle();
+      if ((e as { vertical?: string } | null)?.vertical) vertical = (e as { vertical: string }).vertical;
+    }
+    const { data: m } = await supabase.from("modules").select("id, month_index, title").eq("vertical", vertical).order("month_index");
+    const mods = (m ?? []) as Module[];
+    const modIds = mods.map((x) => x.id);
+    const [dRes, wRes] = await Promise.all([
+      modIds.length ? supabase.from("documents").select("*").in("module_id", modIds).order("created_at", { ascending: false }) : Promise.resolve({ data: [] as Doc[] }),
+      modIds.length ? supabase.from("weeks").select("id, week_index, title, summary").in("module_id", modIds).order("week_index") : Promise.resolve({ data: [] as Week[] }),
     ]);
-    setDocs((d ?? []) as Doc[]);
-    setModules((m ?? []) as Module[]);
-    setWeeks((w ?? []) as Week[]);
+    setDocs((dRes.data ?? []) as Doc[]);
+    setModules(mods);
+    setWeeks((wRes.data ?? []) as Week[]);
     setLoading(false);
   }
 
