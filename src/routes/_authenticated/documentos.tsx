@@ -73,7 +73,7 @@ function DocumentosPage() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { if (user) load(); /* eslint-disable-next-line */ }, [user, isStaff]);
 
   // Resolve client's own enrollment id (for concluded badge)
   useEffect(() => {
