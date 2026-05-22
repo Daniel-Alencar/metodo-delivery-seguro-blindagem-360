@@ -16,6 +16,8 @@ type Enrollment = { id: string; status: string; completed_at: string | null; arc
 function AuthenticatedLayout() {
   const { user, loading, roles, signOut } = useAuth();
   const { needsChoice } = useViewMode();
+  const { needsChoice: needsArea } = useActiveVertical();
+  const isStaff = roles.includes("admin") || roles.includes("mentor");
   const navigate = useNavigate();
   const location = useLocation();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
