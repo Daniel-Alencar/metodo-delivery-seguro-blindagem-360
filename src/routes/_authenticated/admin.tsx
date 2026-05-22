@@ -521,18 +521,16 @@ function AdminPage() {
           </TabsContent>
         )}
 
-        {/* CURRÍCULO — só admin */}
-        {isAdmin && (
-          <TabsContent value="curriculo" className="mt-6">
-            <SectionCard
-              title="Encontros & Modelos"
-              subtitle="Edite o plano de aula de cada um dos 16 encontros e cadastre os modelos (contratos, termos, recibos, notificações). Os modelos com corpo vazio aparecem para o mentorado, mas precisam do conteúdo aqui."
-              icon={<GraduationCap className="h-4 w-4" />}
-            >
-              <CurriculumManager />
-            </SectionCard>
-          </TabsContent>
-        )}
+        {/* CURRÍCULO — admin e mentor */}
+        <TabsContent value="curriculo" className="mt-6">
+          <SectionCard
+            title="Encontros & Modelos"
+            subtitle="Edite o plano de aula de cada um dos 16 encontros e cadastre os modelos (contratos, termos, recibos, notificações). Os modelos com corpo vazio aparecem para o mentorado, mas precisam do conteúdo aqui."
+            icon={<GraduationCap className="h-4 w-4" />}
+          >
+            <CurriculumManager />
+          </SectionCard>
+        </TabsContent>
 
         {/* ACOMPANHAMENTO — só admin */}
         {isAdmin && (
