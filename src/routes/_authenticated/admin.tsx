@@ -348,11 +348,19 @@ function AdminPage() {
                           <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
                           <td className="px-4 py-3 text-right">
                             <div className="flex flex-wrap items-center justify-end gap-2">
+                              <button
+                                onClick={() => navigate({ to: "/admin/aluno/$enrollmentId", params: { enrollmentId: e.id } })}
+                                className="rounded-full border border-foreground/30 bg-foreground/10 px-3 py-1 text-xs hover:bg-foreground/20"
+                                title="Ver dashboard completo do aluno"
+                              >
+                                Ver dashboard
+                              </button>
                               {e.status !== "active" && (
                                 <button onClick={() => activate(e.id)} className="rounded-full bg-foreground px-3 py-1 text-xs text-background">
                                   Ativar
                                 </button>
                               )}
+
                               {e.status === "active" && (
                                 <>
                                   <select
