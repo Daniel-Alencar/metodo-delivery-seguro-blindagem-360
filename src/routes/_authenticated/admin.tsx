@@ -242,6 +242,9 @@ function AdminPage() {
               <HeartPulse className="mr-1.5 h-3.5 w-3.5" /> Acompanhamento
             </TabsTrigger>
           )}
+          <TabsTrigger value="indicacoes" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
+            <Gift className="mr-1.5 h-3.5 w-3.5" /> Indicações
+          </TabsTrigger>
         </TabsList>
 
         {/* APROVAÇÕES */}
