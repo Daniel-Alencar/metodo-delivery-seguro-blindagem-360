@@ -25,6 +25,7 @@ function SignupPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [refCode, setRefCode] = useState(search.ref ?? "");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptLgpd, setAcceptLgpd] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
