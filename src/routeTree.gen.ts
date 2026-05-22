@@ -23,6 +23,7 @@ import { Route as FoodServiceRouteImport } from './routes/food-service'
 import { Route as EsteticaRouteImport } from './routes/estetica'
 import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
+import { Route as EscolherAreaRouteImport } from './routes/escolher-area'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticated/tarefas'
@@ -104,6 +105,11 @@ const EscolherPerfilRoute = EscolherPerfilRouteImport.update({
   path: '/escolher-perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EscolherAreaRoute = EscolherAreaRouteImport.update({
+  id: '/escolher-area',
+  path: '/escolher-area',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -157,6 +163,7 @@ const ApiPublicCronArchiveRoute = ApiPublicCronArchiveRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/estetica': typeof EsteticaRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
     | '/estetica'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
     | '/estetica'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
     | '/estetica'
@@ -314,6 +326,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  EscolherAreaRoute: typeof EscolherAreaRoute
   EscolherPerfilRoute: typeof EscolherPerfilRoute
   EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   EsteticaRoute: typeof EsteticaRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EscolherPerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/escolher-area': {
+      id: '/escolher-area'
+      path: '/escolher-area'
+      fullPath: '/escolher-area'
+      preLoaderRoute: typeof EscolherAreaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -531,6 +551,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  EscolherAreaRoute: EscolherAreaRoute,
   EscolherPerfilRoute: EscolherPerfilRoute,
   EsqueciSenhaRoute: EsqueciSenhaRoute,
   EsteticaRoute: EsteticaRoute,
