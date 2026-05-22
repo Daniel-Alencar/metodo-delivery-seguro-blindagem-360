@@ -46,8 +46,8 @@ export function ComplianceAdminPanel({ isAdmin }: { isAdmin: boolean }) {
   async function load() {
     setLoading(true);
     const [{ data: ov }, { data: its }, { data: ws }] = await Promise.all([
-      supabase.rpc("admin_compliance_overview", { _vertical: vertical ?? null }),
-      supabase.rpc("admin_list_compliance_items", { _vertical: vertical ?? null }),
+      supabase.rpc("admin_compliance_overview", { _vertical: vertical ?? undefined }),
+      supabase.rpc("admin_list_compliance_items", { _vertical: vertical ?? undefined }),
       supabase.from("weeks").select("id, week_index, title").order("week_index"),
     ]);
     setOverview((ov ?? []) as Overview[]);
@@ -61,16 +61,17 @@ export function ComplianceAdminPanel({ isAdmin }: { isAdmin: boolean }) {
   async function upsert(it: Partial<Item>) {
     setBusy(true); setMsg(null);
     const { error } = await supabase.rpc("admin_upsert_compliance_item", {
-      _id: it.id ?? null,
+      _id: it.id ?? undefined,
       _vertical: it.vertical ?? vertical ?? "food-service",
-      _week_id: it.week_id ?? null,
+      _week_id: it.week_id ?? undefined,
       _title: it.title ?? "",
-      _description: it.description ?? null,
+      _description: it.description ?? undefined,
       _weight: it.weight ?? 1,
       _order_index: it.order_index ?? 0,
       _required: it.required ?? true,
       _active: it.active ?? true,
     });
+
     setBusy(false);
     if (error) { setMsg(error.message); return; }
     setMsg("Salvo.");
