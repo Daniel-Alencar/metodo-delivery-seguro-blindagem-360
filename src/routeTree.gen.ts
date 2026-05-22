@@ -34,6 +34,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAcompanhamentoRouteImport } from './routes/_authenticated/acompanhamento'
 import { Route as ApiPublicCronArchiveRouteImport } from './routes/api/public/cron-archive'
+import { Route as AuthenticatedAdminAlunoEnrollmentIdRouteImport } from './routes/_authenticated/admin.aluno.$enrollmentId'
 
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
@@ -160,6 +161,12 @@ const ApiPublicCronArchiveRoute = ApiPublicCronArchiveRouteImport.update({
   path: '/api/public/cron-archive',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminAlunoEnrollmentIdRoute =
+  AuthenticatedAdminAlunoEnrollmentIdRouteImport.update({
+    id: '/aluno/$enrollmentId',
+    path: '/aluno/$enrollmentId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,13 +186,14 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,13 +213,14 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/incidentes': typeof AuthenticatedIncidentesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -233,13 +242,14 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/termos': typeof TermosRoute
   '/_authenticated/acompanhamento': typeof AuthenticatedAcompanhamentoRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/incidentes': typeof AuthenticatedIncidentesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/_authenticated/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
+    | '/admin/aluno/$enrollmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
+    | '/admin/aluno/$enrollmentId'
   id:
     | '__root__'
     | '/'
@@ -321,6 +333,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/tarefas'
     | '/api/public/cron-archive'
+    | '/_authenticated/admin/aluno/$enrollmentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -521,12 +534,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronArchiveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/aluno/$enrollmentId': {
+      id: '/_authenticated/admin/aluno/$enrollmentId'
+      path: '/aluno/$enrollmentId'
+      fullPath: '/admin/aluno/$enrollmentId'
+      preLoaderRoute: typeof AuthenticatedAdminAlunoEnrollmentIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAlunoEnrollmentIdRoute: typeof AuthenticatedAdminAlunoEnrollmentIdRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAlunoEnrollmentIdRoute:
+    AuthenticatedAdminAlunoEnrollmentIdRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAcompanhamentoRoute: typeof AuthenticatedAcompanhamentoRoute
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedIncidentesRoute: typeof AuthenticatedIncidentesRoute
@@ -536,7 +568,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAcompanhamentoRoute: AuthenticatedAcompanhamentoRoute,
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedIncidentesRoute: AuthenticatedIncidentesRoute,
