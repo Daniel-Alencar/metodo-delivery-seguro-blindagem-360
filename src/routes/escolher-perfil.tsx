@@ -26,7 +26,7 @@ function ChoosePage() {
 
   function pick(mode: "admin" | "mentor") {
     setViewMode(mode);
-    navigate({ to: "/admin" });
+    navigate({ to: "/escolher-area" });
   }
 
   if (loading || !user) {
