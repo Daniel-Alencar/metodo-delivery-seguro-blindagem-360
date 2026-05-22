@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, FileText, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle, Compass } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode, clearViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical, clearActiveVertical } from "@/hooks/use-active-vertical";
 import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 
@@ -11,6 +12,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const router = useRouter();
   const { mode, canSwitch, isAdminView } = useViewMode();
+  const { meta: areaMeta } = useActiveVertical();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
   const [openTickets, setOpenTickets] = useState<number>(0);
 
@@ -68,10 +70,24 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {isAdminView ? "Super Admin" : "Mentor"}
               </span>
             )}
+            {isStaff && areaMeta && (
+              <span className={`hidden md:inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] uppercase tracking-wider ${areaMeta.badgeClass}`}>
+                <Compass className="h-3 w-3" /> {areaMeta.short}
+              </span>
+            )}
             <span className="hidden text-xs text-muted-foreground lg:inline">{user?.email}</span>
+            {isStaff && (
+              <button
+                onClick={() => { clearActiveVertical(); navigate({ to: "/escolher-area" }); }}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-card/50 px-3 py-1.5 text-xs hover:bg-card"
+                title="Trocar área"
+              >
+                <Compass className="h-3 w-3" /> Trocar área
+              </button>
+            )}
             {canSwitch && (
               <button
-                onClick={() => { clearViewMode(); navigate({ to: "/escolher-perfil" }); }}
+                onClick={() => { clearViewMode(); clearActiveVertical(); navigate({ to: "/escolher-perfil" }); }}
                 className="inline-flex items-center gap-1 rounded-full border border-border bg-card/50 px-3 py-1.5 text-xs hover:bg-card"
                 title="Trocar perfil"
               >
@@ -79,7 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </button>
             )}
             <button
-              onClick={async () => { clearViewMode(); await signOut(); router.invalidate(); navigate({ to: "/login" }); }}
+              onClick={async () => { clearViewMode(); clearActiveVertical(); await signOut(); router.invalidate(); navigate({ to: "/login" }); }}
               className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/50 px-3 py-1.5 text-xs hover:bg-card"
             >
               <LogOut className="h-3.5 w-3.5" /> Sair

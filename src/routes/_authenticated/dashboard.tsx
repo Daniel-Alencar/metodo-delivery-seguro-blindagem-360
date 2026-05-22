@@ -14,10 +14,16 @@ type Week = { id: string; module_id: string; week_index: number; title: string; 
 type Enrollment = {
   id: string; status: string; started_at: string | null; user_id: string;
   completed_at: string | null; archive_at: string | null; next_step_chosen_at: string | null;
+  vertical: string;
 };
 type Progress = {
   id: string; week_id: string; status: "locked" | "in_progress" | "submitted" | "approved";
   submitted_at: string | null; approved_at: string | null;
+};
+
+const METHOD_BY_VERTICAL: Record<string, string> = {
+  "food-service": "Método Delivery Seguro™",
+  "pet-shop": "Método Pet Shop Seguro — MPS",
 };
 
 const UNLOCK_DAYS = 7;
@@ -213,7 +219,7 @@ function DashboardPage() {
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Sua trilha</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">
-            Método Delivery Seguro™
+            {METHOD_BY_VERTICAL[enrollment.vertical] ?? "Método Delivery Seguro™"}
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             4 meses · 16 encontros semanais · trava de tempo (7 dias) + aprovação do mentor.

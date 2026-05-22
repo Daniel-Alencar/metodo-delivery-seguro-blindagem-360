@@ -4,6 +4,7 @@ import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical, VERTICAL_META } from "@/hooks/use-active-vertical";
 import { CurriculumManager } from "@/components/CurriculumManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -24,6 +25,7 @@ type Mentor = { user_id: string; email: string; full_name: string; is_admin: boo
 function AdminPage() {
   const { isStaff, roles, loading: authLoading } = useAuth();
   const { isAdminView, canSwitch } = useViewMode();
+  const { vertical: activeVertical, meta: areaMeta } = useActiveVertical();
   // Super admin sections only show when in admin view (or user is pure admin without mentor role)
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
   const navigate = useNavigate();
@@ -129,13 +131,16 @@ function AdminPage() {
   }
 
   async function unlockNextWeek(enrollmentId: string) {
+    const enr = enrollments.find((x) => x.id === enrollmentId);
+    const v = enr?.vertical ?? "food-service";
     const [{ data: ws }, { data: ps }] = await Promise.all([
       supabase.from("weeks").select("id, week_index, title, module_id").order("week_index"),
       supabase.from("week_progress").select("week_id, status").eq("enrollment_id", enrollmentId),
     ]);
-    const { data: mods } = await supabase.from("modules").select("id, month_index").eq("vertical", "food-service").order("month_index");
+    const { data: mods } = await supabase.from("modules").select("id, month_index").eq("vertical", v).order("month_index");
     const moduleOrder = new Map((mods ?? []).map((m, i) => [m.id, i]));
-    const ordered = (ws ?? []).slice().sort((a, b) => {
+    const validModuleIds = new Set((mods ?? []).map((m) => m.id));
+    const ordered = (ws ?? []).filter((w) => validModuleIds.has(w.module_id)).slice().sort((a, b) => {
       const am = moduleOrder.get(a.module_id) ?? 99;
       const bm = moduleOrder.get(b.module_id) ?? 99;
       return am - bm || a.week_index - b.week_index;
@@ -167,12 +172,13 @@ function AdminPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header com identificação clara do modo */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/40 p-5 md:flex-row md:items-center md:justify-between">
+      {/* Header com identificação clara do modo e da área */}
+      <div className={`flex flex-col gap-3 rounded-2xl border bg-card/40 p-5 md:flex-row md:items-center md:justify-between ${areaMeta ? `ring-1 ${areaMeta.ringClass}` : "border-border"}`}>
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Painel</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
             {isAdmin ? "Super Admin" : "Mentor"}
+            {areaMeta && <span className="ml-2 text-base font-normal text-muted-foreground">· {areaMeta.label}</span>}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isAdmin
@@ -180,13 +186,21 @@ function AdminPage() {
               : "Aprovações de checkpoint, aulas conduzidas e consulta dos documentos do encontro."}
           </p>
         </div>
-        <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${
-          isAdmin ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-cyan-500/40 bg-cyan-500/10 text-cyan-200"
-        }`}>
-          {isAdmin ? <Crown className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
-          Modo: {isAdmin ? "Super Admin" : "Mentor"}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {areaMeta && (
+            <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${areaMeta.badgeClass}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${areaMeta.dotClass}`} /> Área: {areaMeta.short}
+            </span>
+          )}
+          <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${
+            isAdmin ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-cyan-500/40 bg-cyan-500/10 text-cyan-200"
+          }`}>
+            {isAdmin ? <Crown className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
+            Modo: {isAdmin ? "Super Admin" : "Mentor"}
+          </span>
+        </div>
       </div>
+
 
       <Tabs defaultValue="aprovacoes" className="w-full">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl border border-border bg-card/40 p-1">
@@ -264,7 +278,7 @@ function AdminPage() {
             subtitle="Navegue módulo → encontro → modelos. Clique em um modelo para abrir e consultar durante a aula."
             icon={<BookOpen className="h-4 w-4" />}
           >
-            <LessonDocsPanel />
+            <LessonDocsPanel vertical={activeVertical ?? "food-service"} />
           </SectionCard>
         </TabsContent>
 
@@ -284,6 +298,7 @@ function AdminPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
+                      <th className="px-4 py-3 text-left">Área</th>
                       <th className="px-4 py-3 text-left">Empresa</th>
                       <th className="px-4 py-3 text-left">CNPJ</th>
                       <th className="px-4 py-3 text-left">Treinando</th>
@@ -296,8 +311,14 @@ function AdminPage() {
                   <tbody>
                     {enrollments.map((e) => {
                       const pr = profilesById[e.user_id];
+                      const vMeta = VERTICAL_META[(e.vertical as "food-service" | "pet-shop")] ?? VERTICAL_META["food-service"];
                       return (
-                        <tr key={e.id} className="border-t border-border bg-background/30">
+                        <tr key={e.id} className={`border-t border-border ${vMeta.rowClass}`}>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${vMeta.badgeClass}`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${vMeta.dotClass}`} /> {vMeta.short}
+                            </span>
+                          </td>
                           <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>

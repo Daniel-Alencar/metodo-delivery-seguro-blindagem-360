@@ -115,7 +115,7 @@ function PetShopPage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
             <Sparkles className="h-3 w-3" />
-            Método Pet Shop Seguro™
+            Método Pet Shop Seguro — MPS
           </div>
           <h1 className="mt-5 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
             A central operacional de blindagem para o universo pet.
@@ -245,7 +245,7 @@ function PetShopPage() {
       <footer className="relative border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} Blindagem 360º — Pet Shop</p>
-          <p>Método Pet Shop Seguro™ · Governança aplicada</p>
+          <p>Método Pet Shop Seguro — MPS · Governança aplicada</p>
         </div>
       </footer>
     </div>

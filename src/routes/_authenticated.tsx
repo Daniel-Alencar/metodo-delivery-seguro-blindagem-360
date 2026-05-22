@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RotateCcw, ShieldCheck, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical } from "@/hooks/use-active-vertical";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 
@@ -15,6 +16,8 @@ type Enrollment = { id: string; status: string; completed_at: string | null; arc
 function AuthenticatedLayout() {
   const { user, loading, roles, signOut } = useAuth();
   const { needsChoice } = useViewMode();
+  const { needsChoice: needsArea } = useActiveVertical();
+  const isStaff = roles.includes("admin") || roles.includes("mentor");
   const navigate = useNavigate();
   const location = useLocation();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
@@ -44,6 +47,16 @@ function AuthenticatedLayout() {
       navigate({ to: "/escolher-perfil" });
     }
   }, [loading, needsChoice, location.pathname, navigate]);
+
+  // Staff (admin/mentor) must pick an area (vertical) before entering /admin
+  useEffect(() => {
+    if (loading || needsChoice) return;
+    if (!isStaff) return;
+    if (!needsArea) return;
+    if (location.pathname.startsWith("/escolher-area") || location.pathname.startsWith("/escolher-perfil")) return;
+    navigate({ to: "/escolher-area" });
+  }, [loading, needsChoice, needsArea, isStaff, location.pathname, navigate]);
+
 
   if (loading || !user || checking) {
     return (
