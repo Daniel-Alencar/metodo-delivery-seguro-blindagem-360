@@ -313,19 +313,19 @@ function AdminPage() {
             ) : enrollments.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma matrícula ainda.</p>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border">
-                <table className="w-full text-sm">
+              <div className="overflow-x-auto rounded-xl border border-border">
+                <table className="w-full min-w-[1100px] text-sm">
                   <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
-                      <th className="px-4 py-3 text-left">Área</th>
+                      <th className="px-4 py-3 text-left whitespace-nowrap">Área</th>
                       <th className="px-4 py-3 text-left">Empresa</th>
-                      <th className="px-4 py-3 text-left">CNPJ</th>
+                      <th className="px-4 py-3 text-left whitespace-nowrap">CNPJ</th>
                       <th className="px-4 py-3 text-left">Treinando</th>
                       <th className="px-4 py-3 text-left">E-mail</th>
-                      <th className="px-4 py-3 text-left">Código</th>
-                      <th className="px-4 py-3 text-left">Status</th>
-                      <th className="px-4 py-3 text-left">Criado</th>
-                      <th className="px-4 py-3 text-right">Ações</th>
+                      <th className="px-4 py-3 text-left whitespace-nowrap">Código</th>
+                      <th className="px-4 py-3 text-left whitespace-nowrap">Status</th>
+                      <th className="px-4 py-3 text-left whitespace-nowrap">Criado</th>
+                      <th className="sticky right-0 bg-card/95 backdrop-blur px-4 py-3 text-right whitespace-nowrap">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -334,20 +334,20 @@ function AdminPage() {
                       const vMeta = VERTICAL_META[(e.vertical as "food-service" | "pet-shop")] ?? VERTICAL_META["food-service"];
                       return (
                         <tr key={e.id} className={`border-t border-border ${vMeta.rowClass}`}>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${vMeta.badgeClass}`}>
                               <span className={`h-1.5 w-1.5 rounded-full ${vMeta.dotClass}`} /> {vMeta.short}
                             </span>
                           </td>
                           <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
-                          <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 text-xs">{pr?.email || <span className="text-muted-foreground">—</span>}</td>
-                          <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{e.user_id.slice(0, 8)}</td>
-                          <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
-                          <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex flex-wrap items-center justify-end gap-2">
+                          <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground whitespace-nowrap">{e.user_id.slice(0, 8)}</td>
+                          <td className="px-4 py-3 whitespace-nowrap"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
+                          <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
+                          <td className="sticky right-0 bg-card/95 backdrop-blur px-4 py-3 text-right whitespace-nowrap">
+                            <div className="flex flex-nowrap items-center justify-end gap-2">
                               <button
                                 onClick={() => navigate({ to: "/admin/aluno/$enrollmentId", params: { enrollmentId: e.id } })}
                                 className="rounded-full border border-foreground/30 bg-foreground/10 px-3 py-1 text-xs hover:bg-foreground/20"
@@ -380,7 +380,7 @@ function AdminPage() {
                                       </option>
                                     ))}
                                   </select>
-                                  <button onClick={() => unlockNextWeek(e.id)} className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20">
+                                  <button onClick={() => unlockNextWeek(e.id)} className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20 whitespace-nowrap">
                                     Liberar próxima semana
                                   </button>
                                   <button onClick={() => pause(e.id)} className="rounded-full border border-border px-3 py-1 text-xs">
