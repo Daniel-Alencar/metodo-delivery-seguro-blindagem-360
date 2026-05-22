@@ -241,6 +241,10 @@ function DashboardPage() {
         </div>
       </div>
 
+      <div className="mt-6">
+        <ReferralCard />
+      </div>
+
       <div className="mt-10 space-y-10">
         {modules.map((m) => {
           const monthWeeks = weeks.filter((w) => w.module_id === m.id).sort((a, b) => a.week_index - b.week_index);
