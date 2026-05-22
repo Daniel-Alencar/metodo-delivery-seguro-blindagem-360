@@ -70,9 +70,10 @@ function DashboardPage() {
     try {
       const pending = localStorage.getItem("pendingReferralCode");
       if (pending) {
-        supabase.rpc("apply_referral_code", { _code: pending }).finally(() => {
+        (async () => {
+          try { await supabase.rpc("apply_referral_code", { _code: pending }); } catch { /* ignore */ }
           localStorage.removeItem("pendingReferralCode");
-        });
+        })();
       }
     } catch { /* ignore */ }
     load();
