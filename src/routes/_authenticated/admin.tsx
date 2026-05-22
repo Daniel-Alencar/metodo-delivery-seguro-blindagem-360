@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { useActiveVertical, VERTICAL_META } from "@/hooks/use-active-vertical";
 import { CurriculumManager } from "@/components/CurriculumManager";
+import { ComplianceAdminPanel } from "@/components/ComplianceAdminPanel";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin")({
