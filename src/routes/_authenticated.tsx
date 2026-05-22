@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RotateCcw, ShieldCheck, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical } from "@/hooks/use-active-vertical";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 
