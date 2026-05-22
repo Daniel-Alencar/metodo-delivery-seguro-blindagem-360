@@ -4,11 +4,12 @@ import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 
-type SignupSearch = { vertical?: string };
+type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Criar acesso — Blindagem 360º" }] }),
   validateSearch: (s: Record<string, unknown>): SignupSearch => ({
     vertical: typeof s.vertical === "string" && (s.vertical === "pet-shop" || s.vertical === "food-service") ? s.vertical : undefined,
+    ref: typeof s.ref === "string" ? s.ref.trim().toUpperCase().slice(0, 16) : undefined,
   }),
   component: SignupPage,
 });
