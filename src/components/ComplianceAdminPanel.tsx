@@ -61,16 +61,17 @@ export function ComplianceAdminPanel({ isAdmin }: { isAdmin: boolean }) {
   async function upsert(it: Partial<Item>) {
     setBusy(true); setMsg(null);
     const { error } = await supabase.rpc("admin_upsert_compliance_item", {
-      _id: it.id ?? undefined,
+      _id: (it.id ?? null) as unknown as string,
       _vertical: it.vertical ?? vertical ?? "food-service",
-      _week_id: it.week_id ?? undefined,
+      _week_id: (it.week_id ?? null) as unknown as string,
       _title: it.title ?? "",
-      _description: it.description ?? undefined,
+      _description: (it.description ?? null) as unknown as string,
       _weight: it.weight ?? 1,
       _order_index: it.order_index ?? 0,
       _required: it.required ?? true,
       _active: it.active ?? true,
     });
+
 
     setBusy(false);
     if (error) { setMsg(error.message); return; }
