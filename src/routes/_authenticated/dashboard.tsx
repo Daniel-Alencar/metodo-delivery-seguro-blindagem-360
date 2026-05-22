@@ -4,6 +4,8 @@ import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, H
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ReferralCard } from "@/components/ReferralCard";
+import { ComplianceCard } from "@/components/ComplianceCard";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Trilha — Blindagem 360º" }] }),
