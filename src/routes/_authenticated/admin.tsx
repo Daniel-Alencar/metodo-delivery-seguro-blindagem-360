@@ -545,7 +545,7 @@ type LMod = { id: string; month_index: number; title: string; description: strin
 type LWeek = { id: string; module_id: string; week_index: number; title: string; summary: string | null; agenda: string | null; homework: string | null };
 type LDoc = { id: string; week_id: string | null; module_id: string | null; title: string; description: string | null; body: string | null; version: string };
 
-function LessonDocsPanel() {
+function LessonDocsPanel({ vertical }: { vertical: "food-service" | "pet-shop" }) {
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<LMod[]>([]);
   const [weeks, setWeeks] = useState<LWeek[]>([]);
@@ -554,18 +554,21 @@ function LessonDocsPanel() {
   const [openDoc, setOpenDoc] = useState<LDoc | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
-      const [{ data: m }, { data: w }, { data: d }] = await Promise.all([
-        supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
-        supabase.from("weeks").select("*").order("week_index"),
-        supabase.from("documents").select("*").order("title"),
+      const { data: m } = await supabase.from("modules").select("*").eq("vertical", vertical).order("month_index");
+      const mods = (m ?? []) as LMod[];
+      const modIds = mods.map((x) => x.id);
+      const [wRes, dRes] = await Promise.all([
+        modIds.length ? supabase.from("weeks").select("*").in("module_id", modIds).order("week_index") : Promise.resolve({ data: [] as LWeek[] }),
+        modIds.length ? supabase.from("documents").select("*").in("module_id", modIds).order("title") : Promise.resolve({ data: [] as LDoc[] }),
       ]);
-      setModules((m ?? []) as LMod[]);
-      setWeeks((w ?? []) as LWeek[]);
-      setDocs((d ?? []) as LDoc[]);
+      setModules(mods);
+      setWeeks((wRes.data ?? []) as LWeek[]);
+      setDocs((dRes.data ?? []) as LDoc[]);
       setLoading(false);
     })();
-  }, []);
+  }, [vertical]);
 
   if (loading) return <p className="text-sm text-muted-foreground"><Loader2 className="mr-2 inline h-4 w-4 animate-spin" /> Carregando aulas...</p>;
 
