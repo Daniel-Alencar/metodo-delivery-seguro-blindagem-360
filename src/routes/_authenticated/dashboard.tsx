@@ -65,7 +65,19 @@ function DashboardPage() {
     setLoading(false);
   }
 
-  useEffect(() => { if (user) load(); /* eslint-disable-next-line */ }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const pending = localStorage.getItem("pendingReferralCode");
+      if (pending) {
+        supabase.rpc("apply_referral_code", { _code: pending }).finally(() => {
+          localStorage.removeItem("pendingReferralCode");
+        });
+      }
+    } catch { /* ignore */ }
+    load();
+    /* eslint-disable-next-line */
+  }, [user]);
 
   const orderedWeeks = useMemo(() => {
     return modules.flatMap((m) =>
