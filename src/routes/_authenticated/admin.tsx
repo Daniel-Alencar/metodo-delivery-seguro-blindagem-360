@@ -312,6 +312,7 @@ function AdminPage() {
                       <th className="px-4 py-3 text-left">Empresa</th>
                       <th className="px-4 py-3 text-left">CNPJ</th>
                       <th className="px-4 py-3 text-left">Treinando</th>
+                      <th className="px-4 py-3 text-left">E-mail</th>
                       <th className="px-4 py-3 text-left">Código</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-left">Criado</th>
@@ -332,6 +333,7 @@ function AdminPage() {
                           <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 text-xs">{pr?.email || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{e.user_id.slice(0, 8)}</td>
                           <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
                           <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
