@@ -71,6 +71,9 @@ function SignupPage() {
       }).eq("id", userId);
     }
     if (data.session) {
+      if (refCode.trim()) {
+        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore invalid code */ }
+      }
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
         vertical: chosenVertical,
@@ -78,6 +81,9 @@ function SignupPage() {
       });
       navigate({ to: "/dashboard" });
     } else {
+      if (refCode.trim()) {
+        try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
+      }
       setInfo("Conta criada. Verifique seu e-mail para confirmar e poder entrar.");
       setLoading(false);
     }
