@@ -547,7 +547,19 @@ function AdminPage() {
             <ReferralAdminPanel isAdmin={isAdmin} />
           </SectionCard>
         </TabsContent>
+
+        {/* COMPLIANCE */}
+        <TabsContent value="compliance" className="mt-6">
+          <SectionCard
+            title="Checklist de Compliance e Blindagem"
+            subtitle="Veja a pontuação 0–100 de cada aluno por área, gerencie os itens do checklist (apenas super admin) e identifique quem está atrasado na adequação."
+            icon={<ShieldCheck className="h-4 w-4" />}
+          >
+            <ComplianceAdminPanel isAdmin={isAdmin} />
+          </SectionCard>
+        </TabsContent>
       </Tabs>
+
     </div>
   );
 }
