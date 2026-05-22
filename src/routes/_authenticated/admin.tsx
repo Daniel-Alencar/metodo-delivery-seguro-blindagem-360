@@ -4,6 +4,7 @@ import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical, VERTICAL_META } from "@/hooks/use-active-vertical";
 import { CurriculumManager } from "@/components/CurriculumManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
