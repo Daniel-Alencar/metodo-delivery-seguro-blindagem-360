@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, FileText, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, Crown, LogOut, GraduationCap, Repeat, HeartPulse, ClipboardList, UserCircle, Compass } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode, clearViewMode } from "@/hooks/use-view-mode";
+import { useActiveVertical, clearActiveVertical } from "@/hooks/use-active-vertical";
 import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 
@@ -11,6 +12,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const router = useRouter();
   const { mode, canSwitch, isAdminView } = useViewMode();
+  const { meta: areaMeta } = useActiveVertical();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
   const [openTickets, setOpenTickets] = useState<number>(0);
 
