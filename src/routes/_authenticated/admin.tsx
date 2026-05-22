@@ -289,6 +289,7 @@ function AdminPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
+                      <th className="px-4 py-3 text-left">Área</th>
                       <th className="px-4 py-3 text-left">Empresa</th>
                       <th className="px-4 py-3 text-left">CNPJ</th>
                       <th className="px-4 py-3 text-left">Treinando</th>
@@ -301,8 +302,14 @@ function AdminPage() {
                   <tbody>
                     {enrollments.map((e) => {
                       const pr = profilesById[e.user_id];
+                      const vMeta = VERTICAL_META[(e.vertical as "food-service" | "pet-shop")] ?? VERTICAL_META["food-service"];
                       return (
-                        <tr key={e.id} className="border-t border-border bg-background/30">
+                        <tr key={e.id} className={`border-t border-border ${vMeta.rowClass}`}>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${vMeta.badgeClass}`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${vMeta.dotClass}`} /> {vMeta.short}
+                            </span>
+                          </td>
                           <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
