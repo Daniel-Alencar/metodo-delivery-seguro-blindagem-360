@@ -172,12 +172,13 @@ function AdminPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header com identificação clara do modo */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/40 p-5 md:flex-row md:items-center md:justify-between">
+      {/* Header com identificação clara do modo e da área */}
+      <div className={`flex flex-col gap-3 rounded-2xl border bg-card/40 p-5 md:flex-row md:items-center md:justify-between ${areaMeta ? `ring-1 ${areaMeta.ringClass}` : "border-border"}`}>
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Painel</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
             {isAdmin ? "Super Admin" : "Mentor"}
+            {areaMeta && <span className="ml-2 text-base font-normal text-muted-foreground">· {areaMeta.label}</span>}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isAdmin
@@ -185,13 +186,21 @@ function AdminPage() {
               : "Aprovações de checkpoint, aulas conduzidas e consulta dos documentos do encontro."}
           </p>
         </div>
-        <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${
-          isAdmin ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-cyan-500/40 bg-cyan-500/10 text-cyan-200"
-        }`}>
-          {isAdmin ? <Crown className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
-          Modo: {isAdmin ? "Super Admin" : "Mentor"}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {areaMeta && (
+            <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${areaMeta.badgeClass}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${areaMeta.dotClass}`} /> Área: {areaMeta.short}
+            </span>
+          )}
+          <span className={`inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${
+            isAdmin ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-cyan-500/40 bg-cyan-500/10 text-cyan-200"
+          }`}>
+            {isAdmin ? <Crown className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
+            Modo: {isAdmin ? "Super Admin" : "Mentor"}
+          </span>
+        </div>
       </div>
+
 
       <Tabs defaultValue="aprovacoes" className="w-full">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl border border-border bg-card/40 p-1">
