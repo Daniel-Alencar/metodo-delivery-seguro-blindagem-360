@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, HeartPulse, Download, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { ReferralCard } from "@/components/ReferralCard";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Trilha — Blindagem 360º" }] }),
@@ -64,7 +65,20 @@ function DashboardPage() {
     setLoading(false);
   }
 
-  useEffect(() => { if (user) load(); /* eslint-disable-next-line */ }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const pending = localStorage.getItem("pendingReferralCode");
+      if (pending) {
+        (async () => {
+          try { await supabase.rpc("apply_referral_code", { _code: pending }); } catch { /* ignore */ }
+          localStorage.removeItem("pendingReferralCode");
+        })();
+      }
+    } catch { /* ignore */ }
+    load();
+    /* eslint-disable-next-line */
+  }, [user]);
 
   const orderedWeeks = useMemo(() => {
     return modules.flatMap((m) =>
@@ -225,6 +239,10 @@ function DashboardPage() {
             4 meses · 16 encontros semanais · trava de tempo (7 dias) + aprovação do mentor.
           </p>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ReferralCard />
       </div>
 
       <div className="mt-10 space-y-10">

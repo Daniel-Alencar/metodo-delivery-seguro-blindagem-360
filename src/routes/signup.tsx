@@ -4,11 +4,12 @@ import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 
-type SignupSearch = { vertical?: string };
+type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Criar acesso — Blindagem 360º" }] }),
   validateSearch: (s: Record<string, unknown>): SignupSearch => ({
     vertical: typeof s.vertical === "string" && (s.vertical === "pet-shop" || s.vertical === "food-service") ? s.vertical : undefined,
+    ref: typeof s.ref === "string" ? s.ref.trim().toUpperCase().slice(0, 16) : undefined,
   }),
   component: SignupPage,
 });
@@ -24,6 +25,7 @@ function SignupPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [refCode, setRefCode] = useState(search.ref ?? "");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptLgpd, setAcceptLgpd] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
@@ -69,6 +71,9 @@ function SignupPage() {
       }).eq("id", userId);
     }
     if (data.session) {
+      if (refCode.trim()) {
+        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore invalid code */ }
+      }
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
         vertical: chosenVertical,
@@ -76,6 +81,9 @@ function SignupPage() {
       });
       navigate({ to: "/dashboard" });
     } else {
+      if (refCode.trim()) {
+        try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
+      }
       setInfo("Conta criada. Verifique seu e-mail para confirmar e poder entrar.");
       setLoading(false);
     }
@@ -112,6 +120,18 @@ function SignupPage() {
               <PasswordInput value={password} onChange={setPassword} required autoComplete="new-password" />
             </div>
           </div>
+
+          <div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">Código de indicação (opcional)</label>
+            <input
+              value={refCode}
+              onChange={(e) => setRefCode(e.target.value.toUpperCase().slice(0, 16))}
+              placeholder="Ex: AB12CD34"
+              className="mt-1 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-foreground/40"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">Se alguém te indicou, informe o código aqui.</p>
+          </div>
+
 
           <div className="space-y-3 rounded-md border border-border bg-card/40 p-4 text-xs">
             <Checkbox checked={acceptTerms} onChange={setAcceptTerms}>

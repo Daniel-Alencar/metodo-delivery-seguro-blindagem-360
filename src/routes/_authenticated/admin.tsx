@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History, BarChart3, BookOpen, Users, FileText, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Loader2, Crown, UserPlus, UserMinus, Search, ShieldCheck, GraduationCap, HeartPulse, RotateCcw, ClipboardCheck, History, BarChart3, BookOpen, Users, FileText, ChevronDown, ChevronRight, X, Gift, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
@@ -242,6 +242,9 @@ function AdminPage() {
               <HeartPulse className="mr-1.5 h-3.5 w-3.5" /> Acompanhamento
             </TabsTrigger>
           )}
+          <TabsTrigger value="indicacoes" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
+            <Gift className="mr-1.5 h-3.5 w-3.5" /> Indicações
+          </TabsTrigger>
         </TabsList>
 
         {/* APROVAÇÕES */}
@@ -529,6 +532,17 @@ function AdminPage() {
             </SectionCard>
           </TabsContent>
         )}
+
+        {/* INDICAÇÕES */}
+        <TabsContent value="indicacoes" className="mt-6">
+          <SectionCard
+            title="Programa de indicações"
+            subtitle="Acompanhe quem indicou quem e (super admin) defina o desconto oferecido a cada novo matriculado."
+            icon={<Gift className="h-4 w-4" />}
+          >
+            <ReferralAdminPanel isAdmin={isAdmin} />
+          </SectionCard>
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -989,5 +1003,143 @@ function MonthlyReportPanel() {
         </div>
       )}
     </section>
+  );
+}
+
+/* ===== Painel de Indicações ===== */
+
+type RefRow = {
+  id: string; created_at: string; status: string;
+  discount_percent: number; converted_at: string | null;
+  referrer_id: string; referrer_name: string; referrer_email: string;
+  referred_id: string; referred_name: string; referred_email: string;
+  enrollment_id: string | null; enrollment_status: string | null;
+};
+
+function ReferralAdminPanel({ isAdmin }: { isAdmin: boolean }) {
+  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState<RefRow[]>([]);
+  const [discount, setDiscount] = useState(10);
+  const [active, setActive] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    const [{ data: s }, { data: r }] = await Promise.all([
+      supabase.rpc("get_referral_settings"),
+      supabase.rpc("admin_referral_report"),
+    ]);
+    const settings = Array.isArray(s) ? s[0] : s;
+    if (settings) { setDiscount(Number(settings.discount_percent ?? 10)); setActive(!!settings.active); }
+    setRows((r ?? []) as RefRow[]);
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []);
+
+  async function save() {
+    setSaving(true);
+    setMsg(null);
+    const { error } = await supabase.rpc("admin_set_referral_discount", { _percent: discount, _active: active });
+    setSaving(false);
+    setMsg(error ? `Erro: ${error.message}` : "Configuração salva.");
+    if (!error) await load();
+  }
+
+  if (loading) return <div className="flex items-center text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...</div>;
+
+  const total = rows.length;
+  const converted = rows.filter(r => r.status === "converted").length;
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-4">
+        <p className="text-[11px] uppercase tracking-wider text-fuchsia-200">Configuração</p>
+        <div className="mt-3 grid gap-3 md:grid-cols-[160px_180px_1fr_auto]">
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground">Desconto (%)</label>
+            <input type="number" min={0} max={100} value={discount} disabled={!isAdmin}
+              onChange={(e) => setDiscount(Math.max(0, Math.min(100, Number(e.target.value))))}
+              className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm disabled:opacity-60" />
+          </div>
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground">Status</label>
+            <select value={active ? "1" : "0"} disabled={!isAdmin} onChange={(e) => setActive(e.target.value === "1")}
+              className="mt-1 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm disabled:opacity-60">
+              <option value="1">Ativo</option>
+              <option value="0">Pausado</option>
+            </select>
+          </div>
+          <div className="flex items-end text-xs text-muted-foreground">
+            {isAdmin ? "Apenas super admin pode alterar." : "Somente super admin altera estas configurações."}
+          </div>
+          {isAdmin && (
+            <div className="flex items-end">
+              <button onClick={save} disabled={saving}
+                className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background disabled:opacity-50">
+                <Save className="h-3.5 w-3.5" /> {saving ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          )}
+        </div>
+        {msg && <p className="mt-2 text-xs text-muted-foreground">{msg}</p>}
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="rounded-xl border border-border bg-card/40 p-3">
+          <p className="text-2xl font-semibold">{total}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Indicações</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card/40 p-3">
+          <p className="text-2xl font-semibold text-emerald-300">{converted}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Convertidas</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card/40 p-3">
+          <p className="text-2xl font-semibold text-amber-300">{total - converted}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Pendentes</p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-border bg-card/40">
+        <table className="w-full text-sm">
+          <thead className="bg-card/60 text-[11px] uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2 text-left">Data</th>
+              <th className="px-3 py-2 text-left">Indicador</th>
+              <th className="px-3 py-2 text-left">Indicado</th>
+              <th className="px-3 py-2 text-left">Desconto</th>
+              <th className="px-3 py-2 text-left">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Nenhuma indicação registrada ainda.</td></tr>
+            ) : rows.map((r) => (
+              <tr key={r.id} className="border-t border-border">
+                <td className="px-3 py-2 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                <td className="px-3 py-2">
+                  <p>{r.referrer_name || "—"}</p>
+                  <p className="text-[11px] text-muted-foreground">{r.referrer_email}</p>
+                </td>
+                <td className="px-3 py-2">
+                  <p>{r.referred_name || "—"}</p>
+                  <p className="text-[11px] text-muted-foreground">{r.referred_email}</p>
+                </td>
+                <td className="px-3 py-2 text-xs">{r.discount_percent}%</td>
+                <td className="px-3 py-2">
+                  {r.status === "converted" ? (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-emerald-300">Convertida</span>
+                  ) : r.status === "cancelled" ? (
+                    <span className="rounded-full border border-border bg-card/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">Cancelada</span>
+                  ) : (
+                    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-300">Pendente</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
