@@ -44,6 +44,95 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          order_index: number
+          required: boolean
+          title: string
+          updated_at: string
+          vertical: string
+          week_id: string | null
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          order_index?: number
+          required?: boolean
+          title: string
+          updated_at?: string
+          vertical?: string
+          week_id?: string | null
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          order_index?: number
+          required?: boolean
+          title?: string
+          updated_at?: string
+          vertical?: string
+          week_id?: string | null
+          weight?: number
+        }
+        Relationships: []
+      }
+      compliance_responses: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          enrollment_id: string
+          evidence: string | null
+          id: string
+          item_id: string
+          status: Database["public"]["Enums"]["compliance_status"]
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          enrollment_id: string
+          evidence?: string | null
+          id?: string
+          item_id: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          enrollment_id?: string
+          evidence?: string | null
+          id?: string
+          item_id?: string
+          status?: Database["public"]["Enums"]["compliance_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_responses_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           body: string | null
@@ -783,6 +872,27 @@ export type Database = {
           week_title: string
         }[]
       }
+      admin_compliance_overview: {
+        Args: { _vertical?: string }
+        Returns: {
+          done_weight: number
+          email: string
+          enrollment_id: string
+          full_name: string
+          level: string
+          na_weight: number
+          pending_weight: number
+          score_percent: number
+          status: string
+          total_weight: number
+          user_id: string
+          vertical: string
+        }[]
+      }
+      admin_delete_compliance_item: {
+        Args: { _id: string }
+        Returns: undefined
+      }
       admin_extend_followup: {
         Args: { _days?: number; _user_id: string }
         Returns: string
@@ -796,6 +906,22 @@ export type Database = {
         }[]
       }
       admin_grant_mentor: { Args: { _user_id: string }; Returns: undefined }
+      admin_list_compliance_items: {
+        Args: { _vertical?: string }
+        Returns: {
+          active: boolean
+          description: string
+          id: string
+          order_index: number
+          required: boolean
+          title: string
+          vertical: string
+          week_id: string
+          week_index: number
+          week_title: string
+          weight: number
+        }[]
+      }
       admin_list_mentors: {
         Args: never
         Returns: {
@@ -851,6 +977,20 @@ export type Database = {
         Args: { _active?: boolean; _percent: number }
         Returns: undefined
       }
+      admin_upsert_compliance_item: {
+        Args: {
+          _active: boolean
+          _description: string
+          _id: string
+          _order_index: number
+          _required: boolean
+          _title: string
+          _vertical: string
+          _week_id: string
+          _weight: number
+        }
+        Returns: string
+      }
       apply_referral_code: { Args: { _code: string }; Returns: string }
       cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
       close_support_ticket: { Args: { _ticket_id: string }; Returns: undefined }
@@ -858,8 +998,36 @@ export type Database = {
         Args: { _enrollment_id: string; _notes?: string; _week_id: string }
         Returns: string
       }
+      compliance_score_for_enrollment: {
+        Args: { _enrollment_id: string }
+        Returns: {
+          done_weight: number
+          level: string
+          na_weight: number
+          pending_weight: number
+          score_percent: number
+          total_weight: number
+        }[]
+      }
       count_open_tickets_for_staff: { Args: never; Returns: number }
       daily_archive_expired: { Args: never; Returns: number }
+      get_compliance_for_enrollment: {
+        Args: { _enrollment_id: string }
+        Returns: {
+          completed_at: string
+          description: string
+          evidence: string
+          item_id: string
+          order_index: number
+          required: boolean
+          status: Database["public"]["Enums"]["compliance_status"]
+          title: string
+          week_id: string
+          week_index: number
+          week_title: string
+          weight: number
+        }[]
+      }
       get_or_create_my_referral_code: { Args: never; Returns: string }
       get_referral_settings: {
         Args: never
@@ -896,6 +1064,15 @@ export type Database = {
         Returns: undefined
       }
       request_archive: { Args: { _enrollment_id: string }; Returns: string }
+      set_compliance_status: {
+        Args: {
+          _enrollment_id: string
+          _evidence?: string
+          _item_id: string
+          _status: Database["public"]["Enums"]["compliance_status"]
+        }
+        Returns: undefined
+      }
       staff_finish_meeting: {
         Args: {
           _enrollment_id: string
@@ -911,6 +1088,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentor" | "cliente"
+      compliance_status: "pending" | "done" | "na"
       enrollment_status:
         | "pending"
         | "active"
@@ -942,6 +1120,8 @@ export type Database = {
         | "referral_discount_updated"
         | "referral_created"
         | "referral_converted"
+        | "compliance_marked"
+        | "compliance_item_changed"
       referral_status: "pending" | "converted" | "cancelled"
       ticket_status: "open" | "answered" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
@@ -1073,6 +1253,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentor", "cliente"],
+      compliance_status: ["pending", "done", "na"],
       enrollment_status: [
         "pending",
         "active",
@@ -1106,6 +1287,8 @@ export const Constants = {
         "referral_discount_updated",
         "referral_created",
         "referral_converted",
+        "compliance_marked",
+        "compliance_item_changed",
       ],
       referral_status: ["pending", "converted", "cancelled"],
       ticket_status: ["open", "answered", "closed"],
