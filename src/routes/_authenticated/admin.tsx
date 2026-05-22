@@ -18,7 +18,7 @@ type ProgressRow = {
   id: string; status: string; submitted_at: string | null; week_id: string;
   enrollment_id: string;
 };
-type ProfileLite = { id: string; full_name: string | null; company_name: string | null; cnpj: string | null };
+type ProfileLite = { id: string; full_name: string | null; company_name: string | null; cnpj: string | null; email?: string | null };
 
 type Mentor = { user_id: string; email: string; full_name: string; is_admin: boolean; granted_at: string };
 
@@ -58,12 +58,22 @@ function AdminPage() {
     setAllWeeks((ws ?? []) as { id: string; week_index: number; title: string; module_id: string }[]);
     const ids = Array.from(new Set(enr.map((x) => x.user_id)));
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, full_name, company_name, cnpj")
-        .in("id", ids);
+      const [{ data: profs }, { data: emails }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, company_name, cnpj").in("id", ids),
+        supabase.rpc("admin_list_user_emails", { _ids: ids }),
+      ]);
+      const emailMap = new Map<string, string>(((emails ?? []) as { user_id: string; email: string }[]).map((r) => [r.user_id, r.email]));
       const map: Record<string, ProfileLite> = {};
-      (profs ?? []).forEach((pr) => { map[(pr as ProfileLite).id] = pr as ProfileLite; });
+      (profs ?? []).forEach((pr) => {
+        const p = pr as ProfileLite;
+        map[p.id] = { ...p, email: emailMap.get(p.id) ?? null };
+      });
+      // Include entries that have an email but no profile row yet
+      ids.forEach((uid) => {
+        if (!map[uid] && emailMap.has(uid)) {
+          map[uid] = { id: uid, full_name: null, company_name: null, cnpj: null, email: emailMap.get(uid) ?? null };
+        }
+      });
       setProfilesById(map);
     } else {
       setProfilesById({});
@@ -302,6 +312,7 @@ function AdminPage() {
                       <th className="px-4 py-3 text-left">Empresa</th>
                       <th className="px-4 py-3 text-left">CNPJ</th>
                       <th className="px-4 py-3 text-left">Treinando</th>
+                      <th className="px-4 py-3 text-left">E-mail</th>
                       <th className="px-4 py-3 text-left">Código</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-left">Criado</th>
@@ -322,6 +333,7 @@ function AdminPage() {
                           <td className="px-4 py-3">{pr?.company_name || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-xs">{pr?.cnpj || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3">{pr?.full_name || <span className="text-muted-foreground">—</span>}</td>
+                          <td className="px-4 py-3 text-xs">{pr?.email || <span className="text-muted-foreground">—</span>}</td>
                           <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{e.user_id.slice(0, 8)}</td>
                           <td className="px-4 py-3"><span className="rounded-full border border-border px-2 py-0.5 text-[11px]">{e.status}</span></td>
                           <td className="px-4 py-3 text-muted-foreground">{new Date(e.created_at).toLocaleDateString("pt-BR")}</td>
@@ -545,7 +557,7 @@ type LMod = { id: string; month_index: number; title: string; description: strin
 type LWeek = { id: string; module_id: string; week_index: number; title: string; summary: string | null; agenda: string | null; homework: string | null };
 type LDoc = { id: string; week_id: string | null; module_id: string | null; title: string; description: string | null; body: string | null; version: string };
 
-function LessonDocsPanel() {
+function LessonDocsPanel({ vertical }: { vertical: "food-service" | "pet-shop" }) {
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<LMod[]>([]);
   const [weeks, setWeeks] = useState<LWeek[]>([]);
@@ -554,18 +566,21 @@ function LessonDocsPanel() {
   const [openDoc, setOpenDoc] = useState<LDoc | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
-      const [{ data: m }, { data: w }, { data: d }] = await Promise.all([
-        supabase.from("modules").select("*").eq("vertical", "food-service").order("month_index"),
-        supabase.from("weeks").select("*").order("week_index"),
-        supabase.from("documents").select("*").order("title"),
+      const { data: m } = await supabase.from("modules").select("*").eq("vertical", vertical).order("month_index");
+      const mods = (m ?? []) as LMod[];
+      const modIds = mods.map((x) => x.id);
+      const [wRes, dRes] = await Promise.all([
+        modIds.length ? supabase.from("weeks").select("*").in("module_id", modIds).order("week_index") : Promise.resolve({ data: [] as LWeek[] }),
+        modIds.length ? supabase.from("documents").select("*").in("module_id", modIds).order("title") : Promise.resolve({ data: [] as LDoc[] }),
       ]);
-      setModules((m ?? []) as LMod[]);
-      setWeeks((w ?? []) as LWeek[]);
-      setDocs((d ?? []) as LDoc[]);
+      setModules(mods);
+      setWeeks((wRes.data ?? []) as LWeek[]);
+      setDocs((dRes.data ?? []) as LDoc[]);
       setLoading(false);
     })();
-  }, []);
+  }, [vertical]);
 
   if (loading) return <p className="text-sm text-muted-foreground"><Loader2 className="mr-2 inline h-4 w-4 animate-spin" /> Carregando aulas...</p>;
 
