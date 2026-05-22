@@ -121,6 +121,18 @@ function SignupPage() {
             </div>
           </div>
 
+          <div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">Código de indicação (opcional)</label>
+            <input
+              value={refCode}
+              onChange={(e) => setRefCode(e.target.value.toUpperCase().slice(0, 16))}
+              placeholder="Ex: AB12CD34"
+              className="mt-1 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-foreground/40"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">Se alguém te indicou, informe o código aqui.</p>
+          </div>
+
+
           <div className="space-y-3 rounded-md border border-border bg-card/40 p-4 text-xs">
             <Checkbox checked={acceptTerms} onChange={setAcceptTerms}>
               Li e concordo com os{" "}
