@@ -4,6 +4,8 @@ import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, H
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ReferralCard } from "@/components/ReferralCard";
+import { ComplianceCard } from "@/components/ComplianceCard";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Trilha — Blindagem 360º" }] }),
@@ -241,9 +243,11 @@ function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ReferralCard />
+        {enrollment && <ComplianceCard enrollmentId={enrollment.id} />}
       </div>
+
 
       <div className="mt-10 space-y-10">
         {modules.map((m) => {

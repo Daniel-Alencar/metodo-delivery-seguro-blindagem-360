@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { useActiveVertical, VERTICAL_META } from "@/hooks/use-active-vertical";
 import { CurriculumManager } from "@/components/CurriculumManager";
+import { ComplianceAdminPanel } from "@/components/ComplianceAdminPanel";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -245,6 +247,10 @@ function AdminPage() {
           <TabsTrigger value="indicacoes" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
             <Gift className="mr-1.5 h-3.5 w-3.5" /> Indicações
           </TabsTrigger>
+          <TabsTrigger value="compliance" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
+            <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Compliance
+          </TabsTrigger>
+
         </TabsList>
 
         {/* APROVAÇÕES */}
@@ -543,7 +549,19 @@ function AdminPage() {
             <ReferralAdminPanel isAdmin={isAdmin} />
           </SectionCard>
         </TabsContent>
+
+        {/* COMPLIANCE */}
+        <TabsContent value="compliance" className="mt-6">
+          <SectionCard
+            title="Checklist de Compliance e Blindagem"
+            subtitle="Veja a pontuação 0–100 de cada aluno por área, gerencie os itens do checklist (apenas super admin) e identifique quem está atrasado na adequação."
+            icon={<ShieldCheck className="h-4 w-4" />}
+          >
+            <ComplianceAdminPanel isAdmin={isAdmin} />
+          </SectionCard>
+        </TabsContent>
       </Tabs>
+
     </div>
   );
 }
