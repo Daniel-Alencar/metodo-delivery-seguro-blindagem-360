@@ -245,6 +245,10 @@ function AdminPage() {
           <TabsTrigger value="indicacoes" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
             <Gift className="mr-1.5 h-3.5 w-3.5" /> Indicações
           </TabsTrigger>
+          <TabsTrigger value="compliance" className="data-[state=active]:bg-foreground data-[state=active]:text-background">
+            <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Compliance
+          </TabsTrigger>
+
         </TabsList>
 
         {/* APROVAÇÕES */}
