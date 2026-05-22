@@ -58,12 +58,22 @@ function AdminPage() {
     setAllWeeks((ws ?? []) as { id: string; week_index: number; title: string; module_id: string }[]);
     const ids = Array.from(new Set(enr.map((x) => x.user_id)));
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, full_name, company_name, cnpj")
-        .in("id", ids);
+      const [{ data: profs }, { data: emails }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, company_name, cnpj").in("id", ids),
+        supabase.rpc("admin_list_user_emails", { _ids: ids }),
+      ]);
+      const emailMap = new Map<string, string>(((emails ?? []) as { user_id: string; email: string }[]).map((r) => [r.user_id, r.email]));
       const map: Record<string, ProfileLite> = {};
-      (profs ?? []).forEach((pr) => { map[(pr as ProfileLite).id] = pr as ProfileLite; });
+      (profs ?? []).forEach((pr) => {
+        const p = pr as ProfileLite;
+        map[p.id] = { ...p, email: emailMap.get(p.id) ?? null };
+      });
+      // Include entries that have an email but no profile row yet
+      ids.forEach((uid) => {
+        if (!map[uid] && emailMap.has(uid)) {
+          map[uid] = { id: uid, full_name: null, company_name: null, cnpj: null, email: emailMap.get(uid) ?? null };
+        }
+      });
       setProfilesById(map);
     } else {
       setProfilesById({});
