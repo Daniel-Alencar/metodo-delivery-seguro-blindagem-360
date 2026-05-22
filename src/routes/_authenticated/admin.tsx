@@ -532,6 +532,17 @@ function AdminPage() {
             </SectionCard>
           </TabsContent>
         )}
+
+        {/* INDICAÇÕES */}
+        <TabsContent value="indicacoes" className="mt-6">
+          <SectionCard
+            title="Programa de indicações"
+            subtitle="Acompanhe quem indicou quem e (super admin) defina o desconto oferecido a cada novo matriculado."
+            icon={<Gift className="h-4 w-4" />}
+          >
+            <ReferralAdminPanel isAdmin={isAdmin} />
+          </SectionCard>
+        </TabsContent>
       </Tabs>
     </div>
   );
