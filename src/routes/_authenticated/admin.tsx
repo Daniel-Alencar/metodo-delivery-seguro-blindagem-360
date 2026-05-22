@@ -131,13 +131,16 @@ function AdminPage() {
   }
 
   async function unlockNextWeek(enrollmentId: string) {
+    const enr = enrollments.find((x) => x.id === enrollmentId);
+    const v = enr?.vertical ?? "food-service";
     const [{ data: ws }, { data: ps }] = await Promise.all([
       supabase.from("weeks").select("id, week_index, title, module_id").order("week_index"),
       supabase.from("week_progress").select("week_id, status").eq("enrollment_id", enrollmentId),
     ]);
-    const { data: mods } = await supabase.from("modules").select("id, month_index").eq("vertical", "food-service").order("month_index");
+    const { data: mods } = await supabase.from("modules").select("id, month_index").eq("vertical", v).order("month_index");
     const moduleOrder = new Map((mods ?? []).map((m, i) => [m.id, i]));
-    const ordered = (ws ?? []).slice().sort((a, b) => {
+    const validModuleIds = new Set((mods ?? []).map((m) => m.id));
+    const ordered = (ws ?? []).filter((w) => validModuleIds.has(w.module_id)).slice().sort((a, b) => {
       const am = moduleOrder.get(a.module_id) ?? 99;
       const bm = moduleOrder.get(b.module_id) ?? 99;
       return am - bm || a.week_index - b.week_index;
