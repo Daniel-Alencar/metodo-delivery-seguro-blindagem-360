@@ -115,7 +115,7 @@ function PetShopPage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
             <Sparkles className="h-3 w-3" />
-            Método Pet Shop Seguro™
+            Método Pet Shop Seguro — MPS
           </div>
           <h1 className="mt-5 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
             A central operacional de blindagem para o universo pet.
