@@ -250,10 +250,11 @@ export function ComplianceAdminPanel({ isAdmin }: { isAdmin: boolean }) {
 function EditableRow({
   it, meta, weeks, isAdmin, onSave, onDelete,
 }: {
-  it: Item; meta: ReturnType<typeof VERTICAL_META.__proto__.constructor> extends never ? never : (typeof VERTICAL_META)["food-service"] | undefined;
+  it: Item; meta: (typeof VERTICAL_META)["food-service"] | undefined;
   weeks: WeekOpt[]; isAdmin: boolean;
   onSave: (patch: Partial<Item>) => void; onDelete: () => void;
 }) {
+
   const [edit, setEdit] = useState(false);
   const [draft, setDraft] = useState<Item>(it);
   useEffect(() => { setDraft(it); }, [it]);
