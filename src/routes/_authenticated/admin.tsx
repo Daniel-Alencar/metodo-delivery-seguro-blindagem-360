@@ -25,6 +25,7 @@ type Mentor = { user_id: string; email: string; full_name: string; is_admin: boo
 function AdminPage() {
   const { isStaff, roles, loading: authLoading } = useAuth();
   const { isAdminView, canSwitch } = useViewMode();
+  const { vertical: activeVertical, meta: areaMeta } = useActiveVertical();
   // Super admin sections only show when in admin view (or user is pure admin without mentor role)
   const isAdmin = roles.includes("admin") && (!canSwitch || isAdminView);
   const navigate = useNavigate();
