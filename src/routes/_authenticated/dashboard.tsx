@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, HeartPulse, Download, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { ReferralCard } from "@/components/ReferralCard";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Trilha — Blindagem 360º" }] }),
