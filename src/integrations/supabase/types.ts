@@ -329,6 +329,87 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_settings: {
+        Row: {
+          active: boolean
+          discount_percent: number
+          id: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          discount_percent?: number
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          discount_percent?: number
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          converted_at: string | null
+          created_at: string
+          discount_percent: number
+          enrollment_id: string | null
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          status: Database["public"]["Enums"]["referral_status"]
+        }
+        Insert: {
+          code: string
+          converted_at?: string | null
+          created_at?: string
+          discount_percent: number
+          enrollment_id?: string | null
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Update: {
+          code?: string
+          converted_at?: string | null
+          created_at?: string
+          discount_percent?: number
+          enrollment_id?: string | null
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Relationships: []
+      }
       strategic_messages: {
         Row: {
           body: string
@@ -747,7 +828,30 @@ export type Database = {
           weeks_released: number
         }[]
       }
+      admin_referral_report: {
+        Args: never
+        Returns: {
+          converted_at: string
+          created_at: string
+          discount_percent: number
+          enrollment_id: string
+          enrollment_status: string
+          id: string
+          referred_email: string
+          referred_id: string
+          referred_name: string
+          referrer_email: string
+          referrer_id: string
+          referrer_name: string
+          status: Database["public"]["Enums"]["referral_status"]
+        }[]
+      }
       admin_revoke_mentor: { Args: { _user_id: string }; Returns: undefined }
+      admin_set_referral_discount: {
+        Args: { _active?: boolean; _percent: number }
+        Returns: undefined
+      }
+      apply_referral_code: { Args: { _code: string }; Returns: string }
       cancel_archive: { Args: { _enrollment_id: string }; Returns: undefined }
       close_support_ticket: { Args: { _ticket_id: string }; Returns: undefined }
       close_week_class: {
@@ -756,6 +860,14 @@ export type Database = {
       }
       count_open_tickets_for_staff: { Args: never; Returns: number }
       daily_archive_expired: { Args: never; Returns: number }
+      get_or_create_my_referral_code: { Args: never; Returns: string }
+      get_referral_settings: {
+        Args: never
+        Returns: {
+          active: boolean
+          discount_percent: number
+        }[]
+      }
       log_class_attendance: {
         Args: { _enrollment_id: string; _notes?: string; _week_id: string }
         Returns: string
@@ -763,6 +875,17 @@ export type Database = {
       maybe_graduate_enrollment: {
         Args: { _enrollment_id: string }
         Returns: undefined
+      }
+      my_referral_summary: {
+        Args: never
+        Returns: {
+          active: boolean
+          code: string
+          converted_referrals: number
+          discount_percent: number
+          pending_referrals: number
+          total_referrals: number
+        }[]
       }
       open_support_ticket: {
         Args: { _body: string; _title: string }
@@ -816,6 +939,10 @@ export type Database = {
         | "archive_requested"
         | "archive_cancelled"
         | "content_edited"
+        | "referral_discount_updated"
+        | "referral_created"
+        | "referral_converted"
+      referral_status: "pending" | "converted" | "cancelled"
       ticket_status: "open" | "answered" | "closed"
       week_status: "locked" | "in_progress" | "submitted" | "approved"
     }
@@ -976,7 +1103,11 @@ export const Constants = {
         "archive_requested",
         "archive_cancelled",
         "content_edited",
+        "referral_discount_updated",
+        "referral_created",
+        "referral_converted",
       ],
+      referral_status: ["pending", "converted", "cancelled"],
       ticket_status: ["open", "answered", "closed"],
       week_status: ["locked", "in_progress", "submitted", "approved"],
     },
