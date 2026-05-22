@@ -14,10 +14,16 @@ type Week = { id: string; module_id: string; week_index: number; title: string; 
 type Enrollment = {
   id: string; status: string; started_at: string | null; user_id: string;
   completed_at: string | null; archive_at: string | null; next_step_chosen_at: string | null;
+  vertical: string;
 };
 type Progress = {
   id: string; week_id: string; status: "locked" | "in_progress" | "submitted" | "approved";
   submitted_at: string | null; approved_at: string | null;
+};
+
+const METHOD_BY_VERTICAL: Record<string, string> = {
+  "food-service": "Método Delivery Seguro™",
+  "pet-shop": "Método Pet Shop Seguro — MPS",
 };
 
 const UNLOCK_DAYS = 7;
