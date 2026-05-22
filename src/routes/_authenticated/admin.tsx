@@ -278,7 +278,7 @@ function AdminPage() {
             subtitle="Navegue módulo → encontro → modelos. Clique em um modelo para abrir e consultar durante a aula."
             icon={<BookOpen className="h-4 w-4" />}
           >
-            <LessonDocsPanel />
+            <LessonDocsPanel vertical={activeVertical ?? "food-service"} />
           </SectionCard>
         </TabsContent>
 
