@@ -725,6 +725,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_list_user_emails: {
+        Args: { _ids: string[] }
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       admin_mentor_monthly_report: {
         Args: { _month?: string }
         Returns: {
