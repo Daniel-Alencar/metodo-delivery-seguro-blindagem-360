@@ -16,6 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { meta: areaMeta } = useActiveVertical();
   const isClient = !roles.includes("admin") && !roles.includes("mentor");
   const [openTickets, setOpenTickets] = useState<number>(0);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     if (!isStaff) return;
