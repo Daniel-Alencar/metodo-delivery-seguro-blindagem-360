@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 import { normalizeEmail } from "@/lib/email-utils";
+import { getSignupEmailStatus } from "@/lib/signup-status.functions";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — Blindagem 360º" }] }),
@@ -12,6 +14,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const checkEmailStatus = useServerFn(getSignupEmailStatus);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,6 +65,18 @@ function LoginPage() {
       return;
     }
     setResending(true);
+    const status = await checkEmailStatus({ data: { email: normalized } });
+    if (!status.exists) {
+      setResending(false);
+      setResendMsg("Não encontrei cadastro pendente para este e-mail. Crie a conta primeiro.");
+      return;
+    }
+    if (status.confirmed) {
+      setResending(false);
+      setNeedsConfirm(false);
+      setResendMsg("Este e-mail já está confirmado. Se não conseguir entrar, confira a senha ou use “Esqueci minha senha”.");
+      return;
+    }
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: normalized,
