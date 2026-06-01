@@ -51,8 +51,10 @@ function SignupPage() {
       return;
     }
     setLoading(true);
+    const normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail !== email) setEmail(normalizedEmail);
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/email-confirmado`,
@@ -75,8 +77,10 @@ function SignupPage() {
       }).eq("id", userId);
     }
     if (data.session) {
+      // Sessão imediata só ocorre quando auto-confirm está ligado. Em produção
+      // o usuário precisa confirmar o e-mail antes — tratamos como pendente.
       if (refCode.trim()) {
-        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore invalid code */ }
+        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore */ }
       }
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
@@ -88,9 +92,28 @@ function SignupPage() {
       if (refCode.trim()) {
         try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
       }
-      setInfo("Conta criada. Verifique seu e-mail para confirmar e poder entrar.");
+      setSignedUpEmail(normalizedEmail);
+      setInfo("Conta criada! Enviamos um e-mail de confirmação para " + normalizedEmail + ". Verifique sua caixa de entrada (e a pasta de spam) para ativar seu acesso.");
       setLoading(false);
     }
+  }
+
+  async function handleResend() {
+    setResendMsg(null);
+    const target = normalizeEmail(signedUpEmail ?? email);
+    if (!target || !target.includes("@")) {
+      setResendMsg("Informe seu e-mail acima para reenviar a confirmação.");
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: target,
+      options: { emailRedirectTo: `${window.location.origin}/email-confirmado` },
+    });
+    setResending(false);
+    if (error) setResendMsg(`Não foi possível reenviar: ${error.message}`);
+    else setResendMsg("E-mail de confirmação reenviado. Verifique sua caixa de entrada e o spam.");
   }
 
   return (
