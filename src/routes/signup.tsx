@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
+import { normalizeEmail } from "@/lib/email-utils";
 
 type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
@@ -32,6 +33,9 @@ function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [signedUpEmail, setSignedUpEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendMsg, setResendMsg] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -47,8 +51,10 @@ function SignupPage() {
       return;
     }
     setLoading(true);
+    const normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail !== email) setEmail(normalizedEmail);
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/email-confirmado`,
@@ -71,8 +77,10 @@ function SignupPage() {
       }).eq("id", userId);
     }
     if (data.session) {
+      // Sessão imediata só ocorre quando auto-confirm está ligado. Em produção
+      // o usuário precisa confirmar o e-mail antes — tratamos como pendente.
       if (refCode.trim()) {
-        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore invalid code */ }
+        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore */ }
       }
       await supabase.from("enrollments").insert({
         user_id: data.user!.id,
@@ -84,9 +92,28 @@ function SignupPage() {
       if (refCode.trim()) {
         try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
       }
-      setInfo("Conta criada. Verifique seu e-mail para confirmar e poder entrar.");
+      setSignedUpEmail(normalizedEmail);
+      setInfo("Conta criada! Enviamos um e-mail de confirmação para " + normalizedEmail + ". Verifique sua caixa de entrada (e a pasta de spam) para ativar seu acesso.");
       setLoading(false);
     }
+  }
+
+  async function handleResend() {
+    setResendMsg(null);
+    const target = normalizeEmail(signedUpEmail ?? email);
+    if (!target || !target.includes("@")) {
+      setResendMsg("Informe seu e-mail acima para reenviar a confirmação.");
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: target,
+      options: { emailRedirectTo: `${window.location.origin}/email-confirmado` },
+    });
+    setResending(false);
+    if (error) setResendMsg(`Não foi possível reenviar: ${error.message}`);
+    else setResendMsg("E-mail de confirmação reenviado. Verifique sua caixa de entrada e o spam.");
   }
 
   return (
@@ -163,6 +190,21 @@ function SignupPage() {
             {loading ? "Criando..." : "Criar minha conta"}
           </button>
         </form>
+
+        {(signedUpEmail || info) && (
+          <div className="mt-6 rounded-md border border-border bg-card/40 p-4 text-sm">
+            <p className="text-muted-foreground">Não recebeu o e-mail de confirmação?</p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              className="mt-3 inline-flex items-center justify-center rounded-full border border-border bg-card px-4 py-2 text-xs font-medium hover:bg-card/70 disabled:opacity-50"
+            >
+              {resending ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+            </button>
+            {resendMsg && <p className="mt-2 text-xs text-muted-foreground">{resendMsg}</p>}
+          </div>
+        )}
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem conta? <Link to="/login" className="text-foreground hover:underline">Entrar</Link>
