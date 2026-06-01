@@ -1,9 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 import { normalizeEmail } from "@/lib/email-utils";
+import { getSignupEmailStatus } from "@/lib/signup-status.functions";
 
 type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
@@ -16,7 +18,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
-  const navigate = useNavigate();
+  const checkEmailStatus = useServerFn(getSignupEmailStatus);
   const search = Route.useSearch();
   const chosenVertical = search.vertical ?? "food-service";
   const [fullName, setFullName] = useState("");
@@ -53,12 +55,40 @@ function SignupPage() {
     setLoading(true);
     const normalizedEmail = normalizeEmail(email);
     if (normalizedEmail !== email) setEmail(normalizedEmail);
+    const existing = await checkEmailStatus({ data: { email: normalizedEmail } });
+    if (existing.exists) {
+      if (existing.confirmed) {
+        setError("Este e-mail já tem conta confirmada. Use a página de login ou recupere a senha.");
+        setSignedUpEmail(null);
+        setLoading(false);
+        return;
+      }
+
+      const resend = await resendConfirmation(normalizedEmail);
+      setSignedUpEmail(normalizedEmail);
+      setInfo(resend.ok
+        ? "Este e-mail já estava cadastrado e ainda não confirmado. Reenviei a confirmação para " + normalizedEmail + ". Verifique a caixa de entrada e o spam."
+        : "Este e-mail já estava cadastrado e ainda não confirmado, mas o reenvio falhou: " + resend.message);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: normalizedEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/email-confirmado`,
-        data: { full_name: fullName, company_name: companyName, phone, cpf: cpfDigits },
+        data: {
+          full_name: fullName,
+          company_name: companyName,
+          phone,
+          cpf: cpfDigits,
+          cnpj: cnpj.replace(/\D/g, ""),
+          vertical: chosenVertical,
+          accepted_terms: true,
+          accepted_lgpd: true,
+          marketing_consent: marketingConsent,
+        },
       },
     });
     if (error) {
@@ -66,36 +96,26 @@ function SignupPage() {
       setLoading(false);
       return;
     }
-    const userId = data.user?.id;
-    if (userId) {
-      await supabase.from("profiles").update({
-        cpf: cpfDigits,
-        cnpj: cnpj.replace(/\D/g, "") || null,
-        accepted_terms_at: new Date().toISOString(),
-        accepted_lgpd_at: new Date().toISOString(),
-        marketing_consent: marketingConsent,
-      }).eq("id", userId);
+    if (data.session) await supabase.auth.signOut();
+    if (refCode.trim()) {
+      try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
     }
-    if (data.session) {
-      // Sessão imediata só ocorre quando auto-confirm está ligado. Em produção
-      // o usuário precisa confirmar o e-mail antes — tratamos como pendente.
-      if (refCode.trim()) {
-        try { await supabase.rpc("apply_referral_code", { _code: refCode.trim() }); } catch { /* ignore */ }
-      }
-      await supabase.from("enrollments").insert({
-        user_id: data.user!.id,
-        vertical: chosenVertical,
-        status: "pending",
-      });
-      navigate({ to: "/dashboard" });
-    } else {
-      if (refCode.trim()) {
-        try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
-      }
-      setSignedUpEmail(normalizedEmail);
-      setInfo("Conta criada! Enviamos um e-mail de confirmação para " + normalizedEmail + ". Verifique sua caixa de entrada (e a pasta de spam) para ativar seu acesso.");
-      setLoading(false);
-    }
+
+    const created = await checkEmailStatus({ data: { email: normalizedEmail } });
+    setSignedUpEmail(normalizedEmail);
+    setInfo(created.confirmationSentAt
+      ? "Conta criada! O e-mail de confirmação foi solicitado para " + normalizedEmail + ". Verifique sua caixa de entrada e o spam para ativar seu acesso."
+      : "Conta criada, mas o sistema não registrou o envio do e-mail de confirmação. Clique em “Reenviar e-mail de confirmação” abaixo.");
+    setLoading(false);
+  }
+
+  async function resendConfirmation(target: string) {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: target,
+      options: { emailRedirectTo: `${window.location.origin}/email-confirmado` },
+    });
+    return error ? { ok: false, message: error.message } : { ok: true, message: "ok" };
   }
 
   async function handleResend() {
@@ -106,13 +126,9 @@ function SignupPage() {
       return;
     }
     setResending(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: target,
-      options: { emailRedirectTo: `${window.location.origin}/email-confirmado` },
-    });
+    const result = await resendConfirmation(target);
     setResending(false);
-    if (error) setResendMsg(`Não foi possível reenviar: ${error.message}`);
+    if (!result.ok) setResendMsg(`Não foi possível reenviar: ${result.message}`);
     else setResendMsg("E-mail de confirmação reenviado. Verifique sua caixa de entrada e o spam.");
   }
 
