@@ -16,17 +16,17 @@ import foodHero from "@/assets/food-service-hero.jpg";
 export const Route = createFileRoute("/food-service")({
   head: () => ({
     meta: [
-      { title: "Food Service — Método Delivery Seguro™ | Blindagem 360º" },
+      { title: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º | Blindagem 360º" },
       {
         name: "description",
         content:
-          "Plataforma premium de blindagem jurídica e operacional para delivery, pizzarias, lanchonetes e restaurantes. Jornada guiada de 4 meses com governança aplicada.",
+          "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico (delivery, pizzarias, lanchonetes e restaurantes). Jornada guiada de 4 meses com governança aplicada.",
       },
-      { property: "og:title", content: "Food Service — Método Delivery Seguro™" },
+      { property: "og:title", content: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º" },
       {
         property: "og:description",
         content:
-          "Centro operacional de proteção empresarial para food service: documentos vivos, central de incidentes e Hardware de Prova.",
+          "Centro operacional de proteção empresarial para o Mercado Gastronômico: documentos vivos, central de incidentes e Hardware de Prova.",
       },
     ],
   }),
