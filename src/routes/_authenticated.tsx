@@ -86,7 +86,7 @@ function AuthenticatedLayout() {
           <RotateCcw className="mx-auto h-10 w-10 text-cyan-300" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight md:text-4xl">Bem-vindo de volta</h1>
           <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">
-            Você concluiu a implementação do Método Delivery Seguro™
+            Você concluiu a implementação do Método Blindagem360 - MB360º
             {enrollment.completed_at && (
               <> em <span className="text-foreground">{new Date(enrollment.completed_at).toLocaleDateString("pt-BR")}</span></>
             )}.

@@ -6,7 +6,7 @@ export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
       { title: "Termos de Uso — Blindagem 360º" },
-      { name: "description", content: "Termos de uso da plataforma Blindagem 360º — Método Delivery Seguro™." },
+      { name: "description", content: "Termos de uso da plataforma Blindagem 360º — Método Blindagem360 - MB360º." },
     ],
   }),
   component: TermosPage,
@@ -32,7 +32,7 @@ function TermosPage() {
           <section>
             <h2 className="text-base font-semibold text-foreground">1. Objeto</h2>
             <p>
-              A plataforma <b>Blindagem 360º — Método Delivery Seguro™</b> ("Plataforma") é um sistema
+              A plataforma <b>Blindagem 360º — Método Blindagem360 - MB360º</b> ("Plataforma") é um sistema
               proprietário de mentoria, governança e proteção jurídica aplicada, desenvolvido pelo
               <b> Dr. Glauber Tiago Giachetta</b>. O acesso é pessoal, intransferível e condicionado à
               aprovação de um mentor.

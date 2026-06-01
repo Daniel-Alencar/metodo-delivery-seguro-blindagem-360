@@ -111,7 +111,7 @@ function ManualPage() {
         {/* Capa */}
         <section className="page-break flex min-h-[80vh] flex-col items-center justify-center text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Blindagem 360º</p>
-          <h1 className="mt-4 text-5xl font-bold leading-tight">Método Delivery Seguro™</h1>
+          <h1 className="mt-4 text-5xl font-bold leading-tight">Método Blindagem360 - MB360º</h1>
           <p className="mt-3 text-lg text-gray-700">Manual Completo — 40 Modelos</p>
           <div className="mt-12 text-sm text-gray-700">
             <p className="font-medium">{name}</p>
@@ -189,7 +189,7 @@ function ManualPage() {
         })()}
 
         <footer className="mt-20 border-t border-gray-300 pt-4 text-center text-[11px] leading-relaxed text-gray-500">
-          <p>Blindagem 360º — Método Delivery Seguro™ — © 2026 Dr. Glauber Tiago Giachetta. ® Proibida a reprodução.</p>
+          <p>Blindagem 360º — Método Blindagem360 - MB360º — © 2026 Dr. Glauber Tiago Giachetta. ® Proibida a reprodução.</p>
           <p className="mt-1">
             Documento de uso EXCLUSIVO de <b>{name}</b> — CPF <b>{watermark}</b>. Reprodução, redistribuição ou
             compartilhamento sujeitos a responsabilização <b>civil e criminal</b>.
