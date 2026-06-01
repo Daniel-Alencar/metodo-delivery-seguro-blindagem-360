@@ -166,7 +166,7 @@ function FoodServicePage() {
         >
           <img
             src={foodHero}
-            alt="Operação de food service: entrega protegida da cozinha ao motoboy"
+            alt="Operação do mercado gastronômico: entrega protegida da cozinha ao motoboy"
             width={1536}
             height={1024}
             className="h-full w-full object-cover"
