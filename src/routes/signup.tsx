@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
+import { normalizeEmail } from "@/lib/email-utils";
 
 type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
