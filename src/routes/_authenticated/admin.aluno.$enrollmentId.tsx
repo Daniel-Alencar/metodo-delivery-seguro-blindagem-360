@@ -181,13 +181,16 @@ function StudentDetailPage() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   {monthWeeks.map((w) => {
                     const st = progress[w.id]?.status ?? "locked";
+                    const isLocked = st === "locked";
                     return (
-                      <button
+                      <div
                         key={w.id}
-                        onClick={() => navigate({ to: "/documentos", search: { week: w.id, enrollment: enrollmentId } })}
-                        className="flex items-center justify-between gap-3 rounded-md border border-border bg-card/40 px-3 py-2 text-left text-sm hover:bg-card/70"
+                        className="flex items-center justify-between gap-3 rounded-md border border-border bg-card/40 px-3 py-2 text-left text-sm"
                       >
-                        <div className="min-w-0">
+                        <button
+                          onClick={() => navigate({ to: "/documentos", search: { week: w.id, enrollment: enrollmentId } })}
+                          className="min-w-0 flex-1 text-left hover:opacity-80"
+                        >
                           <p className="truncate">
                             <span className="text-[11px] text-muted-foreground">Enc. {w.week_index}</span> · {w.title}
                             {w.is_checkpoint && <span className="ml-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] uppercase text-amber-300">CKP</span>}
@@ -197,9 +200,33 @@ function StudentDetailPage() {
                               entregue em {new Date(progress[w.id].submitted_at!).toLocaleDateString("pt-BR")}
                             </p>
                           )}
+                        </button>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {isLocked && (
+                            <button
+                              onClick={async () => {
+                                if (!confirm(`Liberar antecipadamente o Encontro ${w.week_index} para este aluno? A ação fica registrada na auditoria como "Liberação antecipada".`)) return;
+                                const { error } = await supabase.rpc("staff_unlock_week", { _enrollment_id: enrollmentId, _week_id: w.id });
+                                if (error) { alert("Erro ao liberar: " + error.message); return; }
+                                // refresh progress + audit
+                                const [{ data: wp }, { data: aud }] = await Promise.all([
+                                  supabase.from("week_progress").select("week_id, status, submitted_at, approved_at, notes").eq("enrollment_id", enrollmentId),
+                                  supabase.from("mentor_audit_log").select("id, action, created_at, notes, week_id").eq("enrollment_id", enrollmentId).order("created_at", { ascending: false }).limit(50),
+                                ]);
+                                const pmap: Record<string, ProgressRow> = {};
+                                ((wp ?? []) as ProgressRow[]).forEach((p) => { pmap[p.week_id] = p; });
+                                setProgress(pmap);
+                                setAudit((aud ?? []) as AuditRow[]);
+                              }}
+                              title="Override do mentor — libera esta semana imediatamente, ignorando os 7 dias."
+                              className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-200 hover:bg-amber-500/20"
+                            >
+                              <KeyRound className="h-3 w-3" /> Liberar antecipadamente
+                            </button>
+                          )}
+                          <StatusBadge status={st} />
                         </div>
-                        <StatusBadge status={st} />
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
