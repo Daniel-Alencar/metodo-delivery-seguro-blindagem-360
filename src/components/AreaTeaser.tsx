@@ -49,7 +49,7 @@ export function AreaTeaser(props: AreaTeaserProps) {
               to="/food-service"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
             >
-              Conhecer Food Service (disponível)
+              Conhecer MERCADO GASTRONÔMICO - Food Service (disponível)
             </Link>
           </div>
         </div>
