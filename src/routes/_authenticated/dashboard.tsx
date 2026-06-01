@@ -95,11 +95,17 @@ function DashboardPage() {
     return progress.find((p) => p.week_id === weekId);
   }
 
-  // Weekly access control: week 1 unlocks on enrollment activation; each
-  // subsequent week unlocks 7 days after the prior week is approved by a mentor.
+  // Weekly access control: week 1 unlocks on enrollment activation; subsequent
+  // weeks unlock 7 days after the prior week is approved by a mentor. The
+  // 7-day wait is NOT mandatory — a mentor can release earlier by creating a
+  // week_progress row for the current week (any status other than "locked").
   function isUnlocked(idx: number): boolean {
     if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) return false;
     if (idx === 0) return true;
+    const current = orderedWeeks[idx];
+    const currProg = current ? getProgress(current.id) : undefined;
+    // Mentor early release: if a progress row already exists for this week, unlock it.
+    if (currProg && currProg.status !== "locked") return true;
     const prev = orderedWeeks[idx - 1];
     if (!prev) return false;
     const prevProg = getProgress(prev.id);
