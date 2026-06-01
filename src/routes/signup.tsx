@@ -191,6 +191,21 @@ function SignupPage() {
           </button>
         </form>
 
+        {(signedUpEmail || info) && (
+          <div className="mt-6 rounded-md border border-border bg-card/40 p-4 text-sm">
+            <p className="text-muted-foreground">Não recebeu o e-mail de confirmação?</p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              className="mt-3 inline-flex items-center justify-center rounded-full border border-border bg-card px-4 py-2 text-xs font-medium hover:bg-card/70 disabled:opacity-50"
+            >
+              {resending ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+            </button>
+            {resendMsg && <p className="mt-2 text-xs text-muted-foreground">{resendMsg}</p>}
+          </div>
+        )}
+
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem conta? <Link to="/login" className="text-foreground hover:underline">Entrar</Link>
         </p>
