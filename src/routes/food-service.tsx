@@ -132,15 +132,15 @@ function FoodServicePage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
             <Sparkles className="h-3 w-3" />
-            Método Delivery Seguro™
+            Método Blindagem360 - MB360º
           </div>
           <h1 className="mt-5 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
-            A central operacional de blindagem para o food service.
+            A central operacional de blindagem para o Mercado Gastronômico.
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
             Não é um repositório de PDFs. É um sistema vivo de implementação jurídica e operacional —
             jornada guiada de 4 meses, documentos contextualizados, central de incidentes e governança
-            aplicada à realidade do delivery.
+            aplicada à realidade do delivery e da operação gastronômica.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
