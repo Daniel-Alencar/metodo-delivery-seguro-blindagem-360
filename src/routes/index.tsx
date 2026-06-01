@@ -36,8 +36,8 @@ type Vertical = {
 const verticals: Vertical[] = [
   {
     to: "/food-service",
-    eyebrow: "Método Delivery Seguro™",
-    title: "Food Service",
+    eyebrow: "Método Blindagem360 - MB360º",
+    title: "MERCADO GASTRONÔMICO - Food Service",
     description:
       "Delivery, pizzarias, lanchonetes, restaurantes e operações afins. Blindagem 360º jurídica e operacional.",
     status: "available",
