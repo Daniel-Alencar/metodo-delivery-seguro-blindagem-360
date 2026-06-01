@@ -95,17 +95,17 @@ function DashboardPage() {
     return progress.find((p) => p.week_id === weekId);
   }
 
-  // TEST MODE: all weeks unlocked for active/graduated/archiving enrollments
-  // To re-enable the 7-day lock + prior approval gate, restore the commented block below.
-  function isUnlocked(_idx: number): boolean {
+  // Weekly access control: week 1 unlocks on enrollment activation; each
+  // subsequent week unlocks 7 days after the prior week is approved by a mentor.
+  function isUnlocked(idx: number): boolean {
     if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) return false;
-    return true;
-    // const prev = orderedWeeks[_idx - 1];
-    // if (_idx === 0) return true;
-    // const prevProg = getProgress(prev.id);
-    // if (!prevProg || prevProg.status !== "approved" || !prevProg.approved_at) return false;
-    // const days = (Date.now() - new Date(prevProg.approved_at).getTime()) / 86_400_000;
-    // return days >= UNLOCK_DAYS;
+    if (idx === 0) return true;
+    const prev = orderedWeeks[idx - 1];
+    if (!prev) return false;
+    const prevProg = getProgress(prev.id);
+    if (!prevProg || prevProg.status !== "approved" || !prevProg.approved_at) return false;
+    const days = (Date.now() - new Date(prevProg.approved_at).getTime()) / 86_400_000;
+    return days >= UNLOCK_DAYS;
   }
 
   async function startWeek(weekId: string) {
