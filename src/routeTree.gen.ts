@@ -24,6 +24,7 @@ import { Route as EsteticaRouteImport } from './routes/estetica'
 import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
 import { Route as EscolherAreaRouteImport } from './routes/escolher-area'
+import { Route as EmailConfirmadoRouteImport } from './routes/email-confirmado'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticated/tarefas'
@@ -111,6 +112,11 @@ const EscolherAreaRoute = EscolherAreaRouteImport.update({
   path: '/escolher-area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailConfirmadoRoute = EmailConfirmadoRouteImport.update({
+  id: '/email-confirmado',
+  path: '/email-confirmado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -170,6 +176,7 @@ const AuthenticatedAdminAlunoEnrollmentIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/email-confirmado'
     | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/email-confirmado'
     | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/email-confirmado'
     | '/escolher-area'
     | '/escolher-perfil'
     | '/esqueci-senha'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  EmailConfirmadoRoute: typeof EmailConfirmadoRoute
   EscolherAreaRoute: typeof EscolherAreaRoute
   EscolherPerfilRoute: typeof EscolherPerfilRoute
   EsqueciSenhaRoute: typeof EsqueciSenhaRoute
@@ -464,6 +477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EscolherAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email-confirmado': {
+      id: '/email-confirmado'
+      path: '/email-confirmado'
+      fullPath: '/email-confirmado'
+      preLoaderRoute: typeof EmailConfirmadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -583,6 +603,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  EmailConfirmadoRoute: EmailConfirmadoRoute,
   EscolherAreaRoute: EscolherAreaRoute,
   EscolherPerfilRoute: EscolherPerfilRoute,
   EsqueciSenhaRoute: EsqueciSenhaRoute,

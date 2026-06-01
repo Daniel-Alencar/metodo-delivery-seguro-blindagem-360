@@ -51,7 +51,7 @@ function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/email-confirmado`,
         data: { full_name: fullName, company_name: companyName, phone, cpf: cpfDigits },
       },
     });
