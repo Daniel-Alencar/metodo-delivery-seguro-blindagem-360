@@ -57,7 +57,7 @@ function LoginPage() {
 
       <main className="relative mx-auto flex max-w-md flex-col px-6 pt-10 pb-20">
         <h1 className="text-3xl font-semibold tracking-tight text-gradient">Entrar na plataforma</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Acesse sua trilha do Método Delivery Seguro™.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Acesse sua trilha do Método Blindagem360 - MB360º.</p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           <div>

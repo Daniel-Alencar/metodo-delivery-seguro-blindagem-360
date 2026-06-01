@@ -160,7 +160,7 @@ function AlunoSection() {
 
       <H2>4. Documentos e modelos</H2>
       <p>
-        Em <b>/documentos</b> você acessa os 40 modelos do Método Delivery Seguro™ (contratos, políticas,
+        Em <b>/documentos</b> você acessa os 40 modelos do Método Blindagem360 - MB360º (contratos, políticas,
         termos). Cada modelo é editável dentro da plataforma.
       </p>
 

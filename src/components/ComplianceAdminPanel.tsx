@@ -165,7 +165,7 @@ export function ComplianceAdminPanel({ isAdmin }: { isAdmin: boolean }) {
                 <label className="text-xs">Área
                   <select value={form.vertical ?? "food-service"} onChange={(e) => setForm((f) => ({ ...f, vertical: e.target.value }))}
                     className="mt-1 w-full rounded-md border border-border bg-card/60 px-2 py-1.5 text-sm">
-                    <option value="food-service">Método Delivery Seguro</option>
+                    <option value="food-service">Método Blindagem360 - MB360º</option>
                     <option value="pet-shop">Método Pet Shop Seguro — MPS</option>
                   </select>
                 </label>
@@ -294,7 +294,7 @@ function EditableRow({
       <td className="px-3 py-2">
         <select value={draft.vertical} onChange={(e) => setDraft({ ...draft, vertical: e.target.value })}
           className="w-full rounded-md border border-border bg-card/60 px-2 py-1 text-xs">
-          <option value="food-service">Delivery Seguro</option>
+          <option value="food-service">MB360º</option>
           <option value="pet-shop">Pet Shop · MPS</option>
         </select>
       </td>

@@ -93,7 +93,7 @@ export function CurriculumManager() {
           onChange={(e) => setVertical(e.target.value as "food-service" | "pet-shop")}
           className="rounded-md border border-border bg-background/60 px-3 py-1.5 text-sm"
         >
-          <option value="food-service">Food Service</option>
+          <option value="food-service">MERCADO GASTRONÔMICO - Food Service</option>
           <option value="pet-shop">Pet Shop</option>
         </select>
       </div>

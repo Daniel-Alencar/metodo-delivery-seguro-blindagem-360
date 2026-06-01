@@ -16,17 +16,17 @@ import foodHero from "@/assets/food-service-hero.jpg";
 export const Route = createFileRoute("/food-service")({
   head: () => ({
     meta: [
-      { title: "Food Service — Método Delivery Seguro™ | Blindagem 360º" },
+      { title: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º | Blindagem 360º" },
       {
         name: "description",
         content:
-          "Plataforma premium de blindagem jurídica e operacional para delivery, pizzarias, lanchonetes e restaurantes. Jornada guiada de 4 meses com governança aplicada.",
+          "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico (delivery, pizzarias, lanchonetes e restaurantes). Jornada guiada de 4 meses com governança aplicada.",
       },
-      { property: "og:title", content: "Food Service — Método Delivery Seguro™" },
+      { property: "og:title", content: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º" },
       {
         property: "og:description",
         content:
-          "Centro operacional de proteção empresarial para food service: documentos vivos, central de incidentes e Hardware de Prova.",
+          "Centro operacional de proteção empresarial para o Mercado Gastronômico: documentos vivos, central de incidentes e Hardware de Prova.",
       },
     ],
   }),
@@ -75,7 +75,7 @@ const journey = [
       "Semana 1 — Atendimento ao consumidor e Procon",
       "Semana 2 — Resposta a notificações e órgãos fiscalizadores",
       "Semana 3 — Crise digital, redes sociais e reputação",
-      "Semana 4 — Certificação Delivery Seguro + plano de monitoramento",
+      "Semana 4 — Certificação MB360º + plano de monitoramento",
     ],
   },
 ];
@@ -108,7 +108,7 @@ const levels = [
   { name: "Estrutura Inicial", tone: "text-amber-300 border-amber-500/30 bg-amber-500/10" },
   { name: "Operação Protegida", tone: "text-yellow-200 border-yellow-500/30 bg-yellow-500/10" },
   { name: "Blindagem Ativa", tone: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10" },
-  { name: "Delivery Seguro Certificado", tone: "text-cyan-200 border-cyan-500/30 bg-cyan-500/10" },
+  { name: "MB360º Certificado", tone: "text-cyan-200 border-cyan-500/30 bg-cyan-500/10" },
 ];
 
 function FoodServicePage() {
@@ -132,15 +132,15 @@ function FoodServicePage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
             <Sparkles className="h-3 w-3" />
-            Método Delivery Seguro™
+            Método Blindagem360 - MB360º
           </div>
           <h1 className="mt-5 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
-            A central operacional de blindagem para o food service.
+            A central operacional de blindagem para o Mercado Gastronômico.
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
             Não é um repositório de PDFs. É um sistema vivo de implementação jurídica e operacional —
             jornada guiada de 4 meses, documentos contextualizados, central de incidentes e governança
-            aplicada à realidade do delivery.
+            aplicada à realidade do delivery e da operação gastronômica.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -166,7 +166,7 @@ function FoodServicePage() {
         >
           <img
             src={foodHero}
-            alt="Operação de food service: entrega protegida da cozinha ao motoboy"
+            alt="Operação do mercado gastronômico: entrega protegida da cozinha ao motoboy"
             width={1536}
             height={1024}
             className="h-full w-full object-cover"
@@ -289,26 +289,27 @@ function FoodServicePage() {
             com o consultor.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
+            <Link
+              to="/signup"
+              search={{ vertical: "food-service" }}
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
             >
               Quero contratar
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              to="/login"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
             >
               Já sou cliente · Entrar
-            </button>
+            </Link>
           </div>
         </div>
       </section>
 
       <footer className="relative border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Blindagem 360º — Food Service</p>
-          <p>Método Delivery Seguro™ · Governança aplicada</p>
+          <p>© {new Date().getFullYear()} Blindagem 360º — MERCADO GASTRONÔMICO - Food Service</p>
+          <p>Método Blindagem360 - MB360º · Governança aplicada</p>
         </div>
       </footer>
     </div>

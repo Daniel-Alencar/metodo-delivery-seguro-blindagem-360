@@ -13,9 +13,9 @@ export const VERTICAL_META: Record<Vertical, {
   dotClass: string;
 }> = {
   "food-service": {
-    label: "Método Delivery Seguro",
-    short: "Delivery Seguro",
-    method: "Método Delivery Seguro™",
+    label: "Método Blindagem360 - MB360º",
+    short: "MB360º",
+    method: "Método Blindagem360 - MB360º",
     badgeClass: "border-blue-500/40 bg-blue-500/15 text-blue-200",
     rowClass: "bg-blue-500/5 hover:bg-blue-500/10",
     ringClass: "ring-blue-500/40",

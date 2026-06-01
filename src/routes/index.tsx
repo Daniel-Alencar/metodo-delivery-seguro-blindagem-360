@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Sistema premium de blindagem empresarial para Food Service, Estética, HOF e Moda. Método proprietário com governança, jornada guiada e proteção jurídica aplicada.",
+          "Sistema premium de blindagem empresarial para Mercado Gastronômico (Food Service), Estética, HOF e Moda. Método proprietário com governança, jornada guiada e proteção jurídica aplicada.",
       },
       { property: "og:title", content: "Blindagem 360º — Plataforma de Proteção Empresarial" },
       {
@@ -36,8 +36,8 @@ type Vertical = {
 const verticals: Vertical[] = [
   {
     to: "/food-service",
-    eyebrow: "Método Delivery Seguro™",
-    title: "Food Service",
+    eyebrow: "Método Blindagem360 - MB360º",
+    title: "MERCADO GASTRONÔMICO - Food Service",
     description:
       "Delivery, pizzarias, lanchonetes, restaurantes e operações afins. Blindagem 360º jurídica e operacional.",
     status: "available",
