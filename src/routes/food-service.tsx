@@ -108,7 +108,7 @@ const levels = [
   { name: "Estrutura Inicial", tone: "text-amber-300 border-amber-500/30 bg-amber-500/10" },
   { name: "Operação Protegida", tone: "text-yellow-200 border-yellow-500/30 bg-yellow-500/10" },
   { name: "Blindagem Ativa", tone: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10" },
-  { name: "Delivery Seguro Certificado", tone: "text-cyan-200 border-cyan-500/30 bg-cyan-500/10" },
+  { name: "MB360º Certificado", tone: "text-cyan-200 border-cyan-500/30 bg-cyan-500/10" },
 ];
 
 function FoodServicePage() {
