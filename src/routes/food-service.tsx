@@ -289,26 +289,27 @@ function FoodServicePage() {
             com o consultor.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
+            <Link
+              to="/signup"
+              search={{ vertical: "food-service" }}
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
             >
               Quero contratar
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              to="/login"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
             >
               Já sou cliente · Entrar
-            </button>
+            </Link>
           </div>
         </div>
       </section>
 
       <footer className="relative border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Blindagem 360º — Food Service</p>
-          <p>Método Delivery Seguro™ · Governança aplicada</p>
+          <p>© {new Date().getFullYear()} Blindagem 360º — MERCADO GASTRONÔMICO - Food Service</p>
+          <p>Método Blindagem360 - MB360º · Governança aplicada</p>
         </div>
       </footer>
     </div>
