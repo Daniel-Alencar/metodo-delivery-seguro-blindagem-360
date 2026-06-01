@@ -293,6 +293,23 @@ function DashboardPage() {
                           Checkpoint do mês
                         </p>
                       )}
+                      {(() => {
+                        // Mostra "Liberada pelo mentor" quando há progresso desta semana
+                        // mas a semana anterior ainda NÃO satisfaz a regra dos 7 dias.
+                        if (!prog || idx === 0) return null;
+                        const prev = orderedWeeks[idx - 1];
+                        const prevProg = prev ? getProgress(prev.id) : undefined;
+                        const eligibleByTime =
+                          prevProg?.status === "approved" &&
+                          prevProg.approved_at &&
+                          (Date.now() - new Date(prevProg.approved_at).getTime()) / 86_400_000 >= UNLOCK_DAYS;
+                        if (eligibleByTime) return null;
+                        return (
+                          <p className="mt-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-200">
+                            Liberada pelo mentor
+                          </p>
+                        );
+                      })()}
                       {(prog || unlocked) && docCounts[w.id] > 0 && (
                         <Link
                           to="/documentos"
