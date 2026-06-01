@@ -75,7 +75,7 @@ const journey = [
       "Semana 1 — Atendimento ao consumidor e Procon",
       "Semana 2 — Resposta a notificações e órgãos fiscalizadores",
       "Semana 3 — Crise digital, redes sociais e reputação",
-      "Semana 4 — Certificação Delivery Seguro + plano de monitoramento",
+      "Semana 4 — Certificação MB360º + plano de monitoramento",
     ],
   },
 ];
