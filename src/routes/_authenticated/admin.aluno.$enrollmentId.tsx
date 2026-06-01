@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, ShieldCheck, GraduationCap, MessageSquare, AlertTriangle, History, FileText, Gift, Mail, Phone, Building2, Hash, CalendarDays, CheckCircle2, Clock, Lock, Send } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, GraduationCap, MessageSquare, AlertTriangle, History, FileText, Gift, Mail, Phone, Building2, Hash, CalendarDays, CheckCircle2, Clock, Lock, Send, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { VERTICAL_META } from "@/hooks/use-active-vertical";
