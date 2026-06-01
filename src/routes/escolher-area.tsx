@@ -42,7 +42,7 @@ function ChooseAreaPage() {
   }
 
   const cards: { v: Vertical; icon: typeof UtensilsCrossed; desc: string }[] = [
-    { v: "food-service", icon: UtensilsCrossed, desc: "Mentoria, encontros e currículo do Food Service / Delivery." },
+    { v: "food-service", icon: UtensilsCrossed, desc: "Mentoria, encontros e currículo do Mercado Gastronômico (Food Service / Delivery)." },
     { v: "pet-shop", icon: PawPrint, desc: "Mentoria, encontros e currículo do universo pet (MPS)." },
   ];
 
