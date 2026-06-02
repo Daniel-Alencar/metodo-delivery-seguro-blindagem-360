@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ShieldCheck, Loader2, Lock, UtensilsCrossed, PawPrint, Repeat } from "lucide-react";
+import { ShieldCheck, Loader2, UtensilsCrossed, PawPrint, Repeat } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { setActiveVertical, VERTICAL_META, type Vertical } from "@/hooks/use-active-vertical";
 import { useViewMode } from "@/hooks/use-view-mode";
@@ -10,11 +10,6 @@ export const Route = createFileRoute("/escolher-area")({
   component: ChooseAreaPage,
 });
 
-const FUTURE = [
-  { code: "estetica", label: "Estética" },
-  { code: "hof", label: "HOF" },
-  { code: "atacado", label: "Atacado" },
-] as const;
 
 function ChooseAreaPage() {
   const { user, loading, isStaff, rolesLoaded } = useAuth();
