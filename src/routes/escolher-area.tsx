@@ -17,16 +17,16 @@ const FUTURE = [
 ] as const;
 
 function ChooseAreaPage() {
-  const { user, loading, isStaff } = useAuth();
+  const { user, loading, isStaff, rolesLoaded } = useAuth();
   const { needsChoice: needsRole } = useViewMode();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !rolesLoaded) return;
     if (!user) { navigate({ to: "/login" }); return; }
     if (!isStaff) { navigate({ to: "/dashboard" }); return; }
     if (needsRole) { navigate({ to: "/escolher-perfil" }); return; }
-  }, [loading, user, isStaff, needsRole, navigate]);
+  }, [loading, rolesLoaded, user, isStaff, needsRole, navigate]);
 
   function pick(v: Vertical) {
     setActiveVertical(v);

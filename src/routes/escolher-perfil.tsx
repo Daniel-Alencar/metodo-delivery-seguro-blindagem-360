@@ -10,19 +10,19 @@ export const Route = createFileRoute("/escolher-perfil")({
 });
 
 function ChoosePage() {
-  const { user, loading, roles } = useAuth();
+  const { user, loading, roles, rolesLoaded } = useAuth();
   const navigate = useNavigate();
   const isAdmin = roles.includes("admin");
   const isMentor = roles.includes("mentor");
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !rolesLoaded) return;
     if (!user) { navigate({ to: "/login" }); return; }
     // Only super-admin (admin + mentor) sees this page. Others get redirected.
     if (!(isAdmin && isMentor)) {
       navigate({ to: isAdmin || isMentor ? "/admin" : "/dashboard" });
     }
-  }, [loading, user, isAdmin, isMentor, navigate]);
+  }, [loading, rolesLoaded, user, isAdmin, isMentor, navigate]);
 
   function pick(mode: "admin" | "mentor") {
     setViewMode(mode);
