@@ -25,15 +25,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const rolesRequestRef = useRef(0);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       authEventRef.current += 1;
-      const requestId = ++rolesRequestRef.current;
+      // TOKEN_REFRESHED / USER_UPDATED keep the same user — only update
+      // the session reference. Re-fetching roles on every refresh causes
+      // rolesLoaded to flap and bounces escolher-perfil/area to /login.
+      if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        setSession(s);
+        return;
+      }
       setSession(s);
       if (s?.user) {
+        const requestId = ++rolesRequestRef.current;
         setRolesLoaded(false);
         setRoles([]);
         setTimeout(() => loadRoles(s.user.id, requestId), 0);
       } else {
+        ++rolesRequestRef.current;
         setRoles([]);
         setRolesLoaded(true);
       }
