@@ -17,7 +17,7 @@ function ChoosePage() {
 
   useEffect(() => {
     if (loading || !rolesLoaded) return;
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) return; // don't bounce mid-flow on transient session blips
     // Only super-admin (admin + mentor) sees this page. Others get redirected.
     if (!(isAdmin && isMentor)) {
       navigate({ to: isAdmin || isMentor ? "/admin" : "/dashboard" });
