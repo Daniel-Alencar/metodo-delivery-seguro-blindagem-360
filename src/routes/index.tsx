@@ -98,30 +98,33 @@ function HubPage() {
           </nav>
         </header>
 
-        <section className="relative mx-auto max-w-7xl px-6 pt-16 pb-12 text-center md:pt-28 md:pb-20">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            Plataforma de Blindagem Empresarial
-          </div>
-          <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
-            Escolha sua área. Ative sua Blindagem 360º.
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
-            Um sistema operacional de proteção jurídica e governança aplicada — desenhada por
-            equipes altamente especializadas para os riscos reais de cada setor.
-          </p>
-        </section>
+        <main>
+          <section className="relative mx-auto max-w-7xl px-6 pt-16 pb-12 text-center md:pt-28 md:pb-20">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Plataforma de Blindagem Empresarial
+            </div>
+            <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-gradient md:text-6xl">
+              Escolha sua área. Ative sua Blindagem 360º.
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
+              Um sistema operacional de proteção jurídica e governança aplicada — desenhada por
+              equipes altamente especializadas para os riscos reais de cada setor.
+            </p>
+          </section>
 
-        <section id="areas" className="relative mx-auto max-w-7xl px-6 pb-28">
-          <div className="grid gap-6 md:grid-cols-2">
-            {verticals.map((v) => (
-              <VerticalCard key={v.to} vertical={v} />
-            ))}
-          </div>
-        </section>
+          <section id="areas" className="relative mx-auto max-w-7xl px-6 pb-28">
+            <div className="grid gap-6 md:grid-cols-2">
+              {verticals.map((v) => (
+                <VerticalCard key={v.to} vertical={v} />
+              ))}
+            </div>
+          </section>
+        </main>
 
         <SiteFooter />
       </div>
+
     </div>
   );
 }
