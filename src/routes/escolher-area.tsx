@@ -17,7 +17,7 @@ function ChooseAreaPage() {
 
   useEffect(() => {
     if (loading || !rolesLoaded) return;
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) return; // don't bounce mid-flow on transient session blips
     if (!isStaff) { navigate({ to: "/dashboard" }); return; }
     if (needsRole) { navigate({ to: "/escolher-perfil" }); return; }
   }, [loading, rolesLoaded, user, isStaff, needsRole, navigate]);
