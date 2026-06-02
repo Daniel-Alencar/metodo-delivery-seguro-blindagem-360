@@ -1,0 +1,12 @@
+# Blindagem 360º
+
+> Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops no Brasil. Jornada guiada, documentos vivos e central de proteção.
+
+## Pages
+
+- [Início](/): Hub com as áreas (verticais) disponíveis.
+- [Mercado Gastronômico](/food-service): Método Blindagem360 (MB360º) para delivery, pizzarias, lanchonetes e restaurantes.
+- [Pet Shop](/petshop): Método Pet Shop Seguro (MPS) para pet shops, banho & tosa, hospedagem e clínicas veterinárias.
+- [Manual do Método](/manual): Visão geral do método e da jornada de implementação.
+- [Política de Privacidade](/privacidade): Tratamento de dados conforme a LGPD.
+- [Termos de Uso](/termos): Regras de uso da plataforma.
