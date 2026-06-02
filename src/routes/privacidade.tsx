@@ -7,8 +7,15 @@ export const Route = createFileRoute("/privacidade")({
     meta: [
       { title: "Política de Privacidade (LGPD) — Blindagem 360º" },
       { name: "description", content: "Política de privacidade e tratamento de dados pessoais conforme a LGPD (Lei nº 13.709/2018)." },
+      { property: "og:title", content: "Política de Privacidade (LGPD) — Blindagem 360º" },
+      { property: "og:description", content: "Como a Blindagem 360º coleta, usa e protege seus dados pessoais conforme a LGPD." },
+      { property: "og:url", content: "https://metodo-delivery-seguro-blindagem-360.lovable.app/privacidade" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://metodo-delivery-seguro-blindagem-360.lovable.app/privacidade" },
     ],
   }),
+
   component: PrivacidadePage,
 });
 
