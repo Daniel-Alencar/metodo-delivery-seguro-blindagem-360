@@ -131,7 +131,9 @@ function PetShopPage() {
         </div>
       </header>
 
+      <main>
       <section className="relative mx-auto grid max-w-7xl gap-10 px-6 pt-12 pb-16 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-20 md:pb-24">
+
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
             <Sparkles className="h-3 w-3" />
