@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_authenticated")({
 type Enrollment = { id: string; status: string; completed_at: string | null; archive_at: string | null };
 
 function AuthenticatedLayout() {
-  const { user, loading, roles, signOut } = useAuth();
+  const { user, loading, roles, rolesLoaded, signOut } = useAuth();
   const { needsChoice } = useViewMode();
   const { needsChoice: needsArea } = useActiveVertical();
   const isStaff = roles.includes("admin") || roles.includes("mentor");
   const navigate = useNavigate();
   const location = useLocation();
-  const isClient = !roles.includes("admin") && !roles.includes("mentor");
+  const isClient = rolesLoaded && !roles.includes("admin") && !roles.includes("mentor");
   const [checking, setChecking] = useState(true);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
 
@@ -29,7 +29,8 @@ function AuthenticatedLayout() {
   }, [loading, user, navigate]);
 
   useEffect(() => {
-    if (!user || !isClient) { setChecking(false); return; }
+    if (!user || !rolesLoaded) return;
+    if (!isClient) { setChecking(false); return; }
     (async () => {
       const { data } = await supabase
         .from("enrollments")
@@ -39,26 +40,27 @@ function AuthenticatedLayout() {
       setEnrollment(data as Enrollment | null);
       setChecking(false);
     })();
-  }, [user, isClient]);
+  }, [user, isClient, rolesLoaded]);
 
   // Super-admin must pick a profile before entering /admin
   useEffect(() => {
-    if (!loading && needsChoice && !location.pathname.startsWith("/escolher-perfil")) {
+    if (loading || !rolesLoaded) return;
+    if (needsChoice && !location.pathname.startsWith("/escolher-perfil")) {
       navigate({ to: "/escolher-perfil" });
     }
-  }, [loading, needsChoice, location.pathname, navigate]);
+  }, [loading, rolesLoaded, needsChoice, location.pathname, navigate]);
 
   // Staff (admin/mentor) must pick an area (vertical) before entering /admin
   useEffect(() => {
-    if (loading || needsChoice) return;
+    if (loading || !rolesLoaded || needsChoice) return;
     if (!isStaff) return;
     if (!needsArea) return;
     if (location.pathname.startsWith("/escolher-area") || location.pathname.startsWith("/escolher-perfil")) return;
     navigate({ to: "/escolher-area" });
-  }, [loading, needsChoice, needsArea, isStaff, location.pathname, navigate]);
+  }, [loading, rolesLoaded, needsChoice, needsArea, isStaff, location.pathname, navigate]);
 
 
-  if (loading || !user || checking) {
+  if (loading || !user || !rolesLoaded || checking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando...
