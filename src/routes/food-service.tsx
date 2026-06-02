@@ -16,22 +16,42 @@ import foodHero from "@/assets/food-service-hero.jpg";
 export const Route = createFileRoute("/food-service")({
   head: () => ({
     meta: [
-      { title: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º | Blindagem 360º" },
+      { title: "Mercado Gastronômico — Método MB360º | Blindagem 360º" },
       {
         name: "description",
         content:
-          "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico (delivery, pizzarias, lanchonetes e restaurantes). Jornada guiada de 4 meses com governança aplicada.",
+          "Blindagem jurídica e operacional para o Mercado Gastronômico: delivery, pizzarias, lanchonetes e restaurantes. Jornada guiada de 4 meses.",
       },
-      { property: "og:title", content: "MERCADO GASTRONÔMICO - Food Service — Método Blindagem360 - MB360º" },
+      { property: "og:title", content: "Mercado Gastronômico — Método MB360º | Blindagem 360º" },
       {
         property: "og:description",
         content:
           "Centro operacional de proteção empresarial para o Mercado Gastronômico: documentos vivos, central de incidentes e Hardware de Prova.",
       },
+      { property: "og:url", content: "https://metodo-delivery-seguro-blindagem-360.lovable.app/food-service" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://metodo-delivery-seguro-blindagem-360.lovable.app/food-service" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: "Método Blindagem360 - MB360º",
+          serviceType: "Blindagem jurídica e operacional para Mercado Gastronômico",
+          provider: { "@type": "Organization", name: "Blindagem 360º", url: "https://metodo-delivery-seguro-blindagem-360.lovable.app/" },
+          url: "https://metodo-delivery-seguro-blindagem-360.lovable.app/food-service",
+          areaServed: "BR",
+        }),
+      },
     ],
   }),
   component: FoodServicePage,
 });
+
 
 const journey = [
   {
@@ -127,8 +147,10 @@ function FoodServicePage() {
         </div>
       </header>
 
+      <main>
       {/* HERO */}
       <section className="relative mx-auto grid max-w-7xl gap-10 px-6 pt-12 pb-16 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-20 md:pb-24">
+
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
             <Sparkles className="h-3 w-3" />
@@ -188,7 +210,7 @@ function FoodServicePage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background/60">
                   <Icon className="h-4 w-4" />
                 </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h3>
+                <h2 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
               </div>
             );
@@ -305,8 +327,10 @@ function FoodServicePage() {
           </div>
         </div>
       </section>
+      </main>
 
       <footer className="relative border-t border-border">
+
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} Blindagem 360º — MERCADO GASTRONÔMICO - Food Service</p>
           <p>Método Blindagem360 - MB360º · Governança aplicada</p>

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /perfil
+Disallow: /acompanhamento
+Disallow: /documentos
+Disallow: /tarefas
+Disallow: /incidentes
+Disallow: /escolher-perfil
+Disallow: /escolher-area
+
+Sitemap: https://metodo-delivery-seguro-blindagem-360.lovable.app/sitemap.xml

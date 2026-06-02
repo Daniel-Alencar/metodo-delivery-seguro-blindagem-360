@@ -7,8 +7,15 @@ export const Route = createFileRoute("/termos")({
     meta: [
       { title: "Termos de Uso — Blindagem 360º" },
       { name: "description", content: "Termos de uso da plataforma Blindagem 360º — Método Blindagem360 - MB360º." },
+      { property: "og:title", content: "Termos de Uso — Blindagem 360º" },
+      { property: "og:description", content: "Regras de uso da plataforma Blindagem 360º, direitos, deveres e condições de contratação." },
+      { property: "og:url", content: "https://metodo-delivery-seguro-blindagem-360.lovable.app/termos" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://metodo-delivery-seguro-blindagem-360.lovable.app/termos" },
     ],
   }),
+
   component: TermosPage,
 });
 

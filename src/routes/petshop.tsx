@@ -16,22 +16,42 @@ import petHero from "@/assets/petshop-hero.jpg";
 export const Route = createFileRoute("/petshop")({
   head: () => ({
     meta: [
-      { title: "Pet Shop — Blindagem 360º para pet shops, banho & tosa e clínicas veterinárias" },
+      { title: "Pet Shop — Método Pet Shop Seguro | Blindagem 360º" },
       {
         name: "description",
         content:
-          "Plataforma premium de blindagem jurídica e operacional para pet shops, banho & tosa, hospedagem e clínicas veterinárias. 4 meses · 16 encontros · documentos vivos.",
+          "Blindagem jurídica e operacional para pet shops, banho & tosa, hospedagem e clínicas veterinárias. 4 meses · 16 encontros · documentos vivos.",
       },
-      { property: "og:title", content: "Pet Shop — Blindagem 360º" },
+      { property: "og:title", content: "Pet Shop — Método Pet Shop Seguro | Blindagem 360º" },
       {
         property: "og:description",
         content:
-          "Societária, trabalhista, consumerista e vigilância sanitária aplicadas ao universo pet — com documentos vivos e governança contínua.",
+          "Societária, trabalhista, consumerista e vigilância sanitária aplicadas ao universo pet — com governança contínua.",
+      },
+      { property: "og:url", content: "https://metodo-delivery-seguro-blindagem-360.lovable.app/petshop" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://metodo-delivery-seguro-blindagem-360.lovable.app/petshop" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: "Método Pet Shop Seguro — MPS",
+          serviceType: "Blindagem jurídica e operacional para o universo pet",
+          provider: { "@type": "Organization", name: "Blindagem 360º", url: "https://metodo-delivery-seguro-blindagem-360.lovable.app/" },
+          url: "https://metodo-delivery-seguro-blindagem-360.lovable.app/petshop",
+          areaServed: "BR",
+        }),
       },
     ],
   }),
   component: PetShopPage,
 });
+
 
 const journey = [
   {
@@ -111,7 +131,9 @@ function PetShopPage() {
         </div>
       </header>
 
+      <main>
       <section className="relative mx-auto grid max-w-7xl gap-10 px-6 pt-12 pb-16 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-20 md:pb-24">
+
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
             <Sparkles className="h-3 w-3" />
@@ -171,7 +193,7 @@ function PetShopPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background/60">
                   <Icon className="h-4 w-4" />
                 </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h3>
+                <h2 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
               </div>
             );
@@ -241,8 +263,10 @@ function PetShopPage() {
           </div>
         </div>
       </section>
+      </main>
 
       <footer className="relative border-t border-border">
+
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} Blindagem 360º — Pet Shop</p>
           <p>Método Pet Shop Seguro — MPS · Governança aplicada</p>

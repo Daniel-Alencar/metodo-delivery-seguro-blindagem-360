@@ -73,18 +73,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "OmniApp Connect is a versatile platform for managing businesses across food service, aesthetics, and fashion retail." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "OmniApp Connect is a versatile platform for managing businesses across food service, aesthetics, and fashion retail." },
+      { title: "Blindagem 360º — Proteção Empresarial" },
+      { name: "description", content: "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops. Jornada guiada, documentos vivos e central de proteção." },
+      { name: "author", content: "Blindagem 360º" },
+      { property: "og:site_name", content: "Blindagem 360º" },
+      { property: "og:title", content: "Blindagem 360º — Proteção Empresarial" },
+      { property: "og:description", content: "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops. Jornada guiada, documentos vivos e central de proteção." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "OmniApp Connect is a versatile platform for managing businesses across food service, aesthetics, and fashion retail." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e68baaa-0e22-4019-9948-cf04b4694932/id-preview-faef44dd--9aea681c-f9f7-42e2-a45c-680238c67104.lovable.app-1778796408883.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e68baaa-0e22-4019-9948-cf04b4694932/id-preview-faef44dd--9aea681c-f9f7-42e2-a45c-680238c67104.lovable.app-1778796408883.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Blindagem 360º — Proteção Empresarial" },
+      { name: "twitter:description", content: "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops." },
     ],
     links: [
       {
@@ -92,7 +90,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Blindagem 360º",
+          url: "https://metodo-delivery-seguro-blindagem-360.lovable.app",
+          description: "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops.",
+        }),
+      },
+    ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
