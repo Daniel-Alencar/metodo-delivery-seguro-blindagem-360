@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ShieldCheck, Loader2, UtensilsCrossed, PawPrint, Repeat } from "lucide-react";
+import { ShieldCheck, Loader2, Lock, UtensilsCrossed, PawPrint, Repeat } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { setActiveVertical, VERTICAL_META, type Vertical } from "@/hooks/use-active-vertical";
 import { useViewMode } from "@/hooks/use-view-mode";
@@ -10,6 +10,11 @@ export const Route = createFileRoute("/escolher-area")({
   component: ChooseAreaPage,
 });
 
+const FUTURE = [
+  { code: "estetica", label: "Estética" },
+  { code: "hof", label: "HOF" },
+  { code: "atacado", label: "Atacado" },
+] as const;
 
 function ChooseAreaPage() {
   const { user, loading, isStaff, rolesLoaded } = useAuth();
@@ -81,6 +86,16 @@ function ChooseAreaPage() {
           })}
         </div>
 
+        <div className="mt-10">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Em breve</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {FUTURE.map((f) => (
+              <span key={f.code} className="inline-flex items-center gap-1 rounded-full border border-border bg-card/40 px-3 py-1 text-xs text-muted-foreground">
+                <Lock className="h-3 w-3" /> {f.label}
+              </span>
+            ))}
+          </div>
+        </div>
       </main>
     </div>
   );
