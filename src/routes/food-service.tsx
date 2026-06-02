@@ -208,7 +208,7 @@ function FoodServicePage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background/60">
                   <Icon className="h-4 w-4" />
                 </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h3>
+                <h2 className="mt-5 text-base font-semibold tracking-tight">{p.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
               </div>
             );
