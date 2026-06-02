@@ -81,16 +81,6 @@ function ChooseAreaPage() {
           })}
         </div>
 
-        <div className="mt-10">
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Em breve</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {FUTURE.map((f) => (
-              <span key={f.code} className="inline-flex items-center gap-1 rounded-full border border-border bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-                <Lock className="h-3 w-3" /> {f.label}
-              </span>
-            ))}
-          </div>
-        </div>
       </main>
     </div>
   );
