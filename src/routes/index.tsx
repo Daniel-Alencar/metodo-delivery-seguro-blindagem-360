@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Sistema premium de blindagem empresarial para Mercado Gastronômico (Food Service), Estética, HOF e Moda. Método proprietário com governança, jornada guiada e proteção jurídica aplicada.",
+          "Blindagem empresarial premium para Mercado Gastronômico e Pet Shops. Método proprietário, jornada guiada e proteção jurídica aplicada.",
       },
       { property: "og:title", content: "Blindagem 360º — Plataforma de Proteção Empresarial" },
       {
@@ -17,10 +17,27 @@ export const Route = createFileRoute("/")({
         content:
           "Escolha sua área e ative a Blindagem 360º: jornada guiada, documentos vivos e central de proteção operacional.",
       },
+      { property: "og:url", content: "https://metodo-delivery-seguro-blindagem-360.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://metodo-delivery-seguro-blindagem-360.lovable.app/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Blindagem 360º",
+          url: "https://metodo-delivery-seguro-blindagem-360.lovable.app/",
+          description: "Plataforma premium de blindagem jurídica e operacional para o Mercado Gastronômico e Pet Shops.",
+        }),
+      },
     ],
   }),
   component: HubPage,
 });
+
 
 type Vertical = {
   to: string;
