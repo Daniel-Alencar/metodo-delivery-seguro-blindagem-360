@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -21,22 +21,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<Role[]>([]);
   const [rolesLoaded, setRolesLoaded] = useState(false);
+  const authEventRef = useRef(0);
+  const rolesRequestRef = useRef(0);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      authEventRef.current += 1;
+      const requestId = ++rolesRequestRef.current;
       setSession(s);
       if (s?.user) {
         setRolesLoaded(false);
-        setTimeout(() => loadRoles(s.user.id), 0);
+        setRoles([]);
+        setTimeout(() => loadRoles(s.user.id, requestId), 0);
       } else {
         setRoles([]);
         setRolesLoaded(true);
       }
+      setLoading(false);
     });
+    const initialAuthEventId = authEventRef.current;
     supabase.auth.getSession().then(({ data }) => {
+      if (authEventRef.current !== initialAuthEventId) {
+        setLoading(false);
+        return;
+      }
+      const requestId = ++rolesRequestRef.current;
       setSession(data.session);
       if (data.session?.user) {
-        loadRoles(data.session.user.id);
+        setRolesLoaded(false);
+        loadRoles(data.session.user.id, requestId);
       } else {
         setRolesLoaded(true);
       }
@@ -45,9 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  async function loadRoles(userId: string) {
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    setRoles((data ?? []).map((r) => r.role as Role));
+  async function loadRoles(userId: string, requestId = ++rolesRequestRef.current) {
+    const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    if (rolesRequestRef.current !== requestId) return;
+    if (error) {
+      console.error("Erro ao carregar permissões do usuário", error);
+      setRoles([]);
+    } else {
+      setRoles((data ?? []).map((r) => r.role as Role));
+    }
     setRolesLoaded(true);
   }
 
@@ -59,6 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     rolesLoaded,
     isStaff: roles.includes("admin") || roles.includes("mentor"),
     signOut: async () => {
+      ++rolesRequestRef.current;
+      setRoles([]);
+      setRolesLoaded(true);
       await supabase.auth.signOut();
     },
   };
