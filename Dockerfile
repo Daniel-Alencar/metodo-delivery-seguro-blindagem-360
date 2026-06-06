@@ -1,5 +1,5 @@
 # ===== STAGE 1: build =====
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN npm run build
 
 
 # ===== STAGE 2: production =====
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
