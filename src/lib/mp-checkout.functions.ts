@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { Preference, PreApproval, PreApprovalPlan } from 'mercadopago';
+import { Preference, PreApprovalPlan } from 'mercadopago';
 import { getMpClient } from '@/integrations/mercadopago/client.server';
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
@@ -76,11 +76,15 @@ export const createMpCheckout = createServerFn({ method: 'POST' })
       return { checkoutUrl: pref.init_point! };
 
     } else {
-      // Plano B: assinatura recorrente via PreApproval
+      // Plano B: assinatura recorrente via PreApprovalPlan
+      // O MP exige card_token_id para criar uma PreApproval via API.
+      // O fluxo correto é redirecionar para o init_point do PreApprovalPlan,
+      // onde o usuário preenche os dados do cartão no lado do Mercado Pago.
+      const planApi = new PreApprovalPlan(mp);
       let mpPlanId = plan.mp_plan_id;
+      let checkoutUrl: string;
 
       if (!mpPlanId) {
-        const planApi = new PreApprovalPlan(mp);
         const planRes = await planApi.create({
           body: {
             reason: plan.name,
@@ -91,35 +95,31 @@ export const createMpCheckout = createServerFn({ method: 'POST' })
               currency_id: 'BRL',
             },
             back_url: `${siteUrl}/pagamento/sucesso`,
+            notification_url: `${siteUrl}/api/mp-webhook`,
             status: 'active',
           },
         });
         mpPlanId = planRes.id ?? null;
+        checkoutUrl = planRes.init_point!;
         if (mpPlanId) {
           await supabaseAdmin.from('plans').update({ mp_plan_id: mpPlanId }).eq('id', plan.id);
         }
+      } else {
+        // Plano já existe: busca o init_point no MP
+        const planData = await planApi.get({ id: mpPlanId });
+        checkoutUrl = planData.init_point!;
       }
 
-      if (!mpPlanId) throw new Error('Não foi possível criar o plano de assinatura.');
-
-      const preApprovalApi = new PreApproval(mp);
-      const subRes = await preApprovalApi.create({
-        body: {
-          preapproval_plan_id: mpPlanId,
-          payer_email: user.email,
-          external_reference: externalRef,
-          back_url: `${siteUrl}/pagamento/sucesso`,
-        },
-      });
+      if (!checkoutUrl) throw new Error('Não foi possível obter o link de assinatura.');
 
       await upsertSubscription(userId, plan.id, {
         status: 'pending',
-        mp_preapproval_id: subRes.id ?? null,
+        mp_preapproval_id: null,
         mp_preference_id: null,
         mp_payment_id: null,
       });
 
-      return { checkoutUrl: subRes.init_point! };
+      return { checkoutUrl };
     }
   });
 
