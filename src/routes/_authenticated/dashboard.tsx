@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, HeartPulse, Download, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Lock, Loader2, Send, Calendar, FileText, GraduationCap, HeartPulse, Download, AlertTriangle, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ReferralCard } from "@/components/ReferralCard";
@@ -202,16 +202,41 @@ function DashboardPage() {
 
   if (!enrollment || !["active", "graduated", "archiving"].includes(enrollment.status)) {
     return (
-      <div className="rounded-2xl border border-border bg-card/50 p-10 text-center">
-        <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight">Acesso aguardando ativação</h1>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Sua conta foi criada com sucesso. Assim que sua matrícula for ativada por um mentor, sua trilha
-          de 4 meses (16 encontros semanais) ficará disponível aqui.
-        </p>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Status atual: <span className="font-medium text-foreground">{enrollment?.status ?? "sem matrícula"}</span>
-        </p>
+      <div className="mx-auto max-w-2xl">
+        <div className="rounded-2xl border border-border bg-card/50 p-8 text-center">
+          <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight">Ative seu acesso</h1>
+          <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
+            Para acessar sua trilha de 4 meses com os 16 encontros semanais, escolha um plano e realize o pagamento.
+            O acesso é liberado automaticamente após a confirmação.
+          </p>
+          <Link
+            to="/checkout"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
+          >
+            <CreditCard className="h-4 w-4" /> Ver planos e assinar
+          </Link>
+          {enrollment?.status && (
+            <p className="mt-4 text-xs text-muted-foreground">
+              Status: <span className="font-medium text-foreground">{enrollment.status}</span>
+            </p>
+          )}
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card/40 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Plano Consultoria</p>
+            <p className="mt-1 text-2xl font-bold">R$ 497</p>
+            <p className="text-xs text-muted-foreground">pagamento único · parcele em até 12×</p>
+            <p className="mt-2 text-xs text-muted-foreground">16 aulas + documentos + consultoria por 4 meses</p>
+          </div>
+          <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Plano Acompanhamento</p>
+            <p className="mt-1 text-2xl font-bold">R$ 97<span className="text-base font-normal text-muted-foreground">/mês</span></p>
+            <p className="text-xs text-muted-foreground">assinatura mensal · cancele quando quiser</p>
+            <p className="mt-2 text-xs text-muted-foreground">Tudo do Plano A + mentoria constante</p>
+          </div>
+        </div>
       </div>
     );
   }

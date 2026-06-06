@@ -339,6 +339,7 @@ export type Database = {
           description: string | null
           discount_percent: number
           id: string
+          mp_plan_id: string | null
           name: string
           stripe_price_id: string | null
           updated_at: string
@@ -354,6 +355,7 @@ export type Database = {
           description?: string | null
           discount_percent?: number
           id?: string
+          mp_plan_id?: string | null
           name: string
           stripe_price_id?: string | null
           updated_at?: string
@@ -369,6 +371,7 @@ export type Database = {
           description?: string | null
           discount_percent?: number
           id?: string
+          mp_plan_id?: string | null
           name?: string
           stripe_price_id?: string | null
           updated_at?: string
@@ -532,6 +535,9 @@ export type Database = {
           current_month: number
           followup_paid_until: string | null
           id: string
+          mp_payment_id: string | null
+          mp_preference_id: string | null
+          mp_preapproval_id: string | null
           paid_until: string | null
           plan_id: string
           status: string
@@ -546,6 +552,9 @@ export type Database = {
           current_month?: number
           followup_paid_until?: string | null
           id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          mp_preapproval_id?: string | null
           paid_until?: string | null
           plan_id: string
           status?: string
@@ -560,6 +569,9 @@ export type Database = {
           current_month?: number
           followup_paid_until?: string | null
           id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          mp_preapproval_id?: string | null
           paid_until?: string | null
           plan_id?: string
           status?: string

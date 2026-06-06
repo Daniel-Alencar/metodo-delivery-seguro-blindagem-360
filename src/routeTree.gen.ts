@@ -15,6 +15,9 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PetshopRouteImport } from './routes/petshop'
+import { Route as PagamentoSucessoRouteImport } from './routes/pagamento.sucesso'
+import { Route as PagamentoPendenteRouteImport } from './routes/pagamento.pendente'
+import { Route as PagamentoFalouRouteImport } from './routes/pagamento.falhou'
 import { Route as ModaRouteImport } from './routes/moda'
 import { Route as ManualImpressaoRouteImport } from './routes/manual-impressao'
 import { Route as ManualRouteImport } from './routes/manual'
@@ -26,6 +29,7 @@ import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as EscolherPerfilRouteImport } from './routes/escolher-perfil'
 import { Route as EscolherAreaRouteImport } from './routes/escolher-area'
 import { Route as EmailConfirmadoRouteImport } from './routes/email-confirmado'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticated/tarefas'
@@ -36,8 +40,34 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAcompanhamentoRouteImport } from './routes/_authenticated/acompanhamento'
 import { Route as ApiPublicCronArchiveRouteImport } from './routes/api/public/cron-archive'
+import { Route as ApiMpWebhookRouteImport } from './routes/api/mp-webhook'
 import { Route as AuthenticatedAdminAlunoEnrollmentIdRouteImport } from './routes/_authenticated/admin.aluno.$enrollmentId'
 
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentoSucessoRoute = PagamentoSucessoRouteImport.update({
+  id: '/pagamento/sucesso',
+  path: '/pagamento/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentoPendenteRoute = PagamentoPendenteRouteImport.update({
+  id: '/pagamento/pendente',
+  path: '/pagamento/pendente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentoFalouRoute = PagamentoFalouRouteImport.update({
+  id: '/pagamento/falhou',
+  path: '/pagamento/falhou',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMpWebhookRoute = ApiMpWebhookRouteImport.update({
+  id: '/api/mp-webhook',
+  path: '/api/mp-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
   path: '/termos',
@@ -182,6 +212,7 @@ const AuthenticatedAdminAlunoEnrollmentIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
@@ -193,6 +224,9 @@ export interface FileRoutesByFullPath {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/pagamento/sucesso': typeof PagamentoSucessoRoute
+  '/pagamento/pendente': typeof PagamentoPendenteRoute
+  '/pagamento/falhou': typeof PagamentoFalouRoute
   '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -207,10 +241,12 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/api/mp-webhook': typeof ApiMpWebhookRoute
   '/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
   '/escolher-perfil': typeof EscolherPerfilRoute
@@ -222,6 +258,9 @@ export interface FileRoutesByTo {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/pagamento/sucesso': typeof PagamentoSucessoRoute
+  '/pagamento/pendente': typeof PagamentoPendenteRoute
+  '/pagamento/falhou': typeof PagamentoFalouRoute
   '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -236,11 +275,13 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/api/mp-webhook': typeof ApiMpWebhookRoute
   '/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/email-confirmado': typeof EmailConfirmadoRoute
   '/escolher-area': typeof EscolherAreaRoute
@@ -253,6 +294,9 @@ export interface FileRoutesById {
   '/manual': typeof ManualRoute
   '/manual-impressao': typeof ManualImpressaoRoute
   '/moda': typeof ModaRoute
+  '/pagamento/sucesso': typeof PagamentoSucessoRoute
+  '/pagamento/pendente': typeof PagamentoPendenteRoute
+  '/pagamento/falhou': typeof PagamentoFalouRoute
   '/petshop': typeof PetshopRoute
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -267,12 +311,14 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/tarefas': typeof AuthenticatedTarefasRoute
   '/api/public/cron-archive': typeof ApiPublicCronArchiveRoute
+  '/api/mp-webhook': typeof ApiMpWebhookRoute
   '/_authenticated/admin/aluno/$enrollmentId': typeof AuthenticatedAdminAlunoEnrollmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/checkout'
     | '/email-confirmado'
     | '/escolher-area'
     | '/escolher-perfil'
@@ -284,6 +330,9 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/pagamento/sucesso'
+    | '/pagamento/pendente'
+    | '/pagamento/falhou'
     | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
@@ -298,10 +347,12 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
+    | '/api/mp-webhook'
     | '/admin/aluno/$enrollmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/checkout'
     | '/email-confirmado'
     | '/escolher-area'
     | '/escolher-perfil'
@@ -313,6 +364,9 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/pagamento/sucesso'
+    | '/pagamento/pendente'
+    | '/pagamento/falhou'
     | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
@@ -327,10 +381,12 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/tarefas'
     | '/api/public/cron-archive'
+    | '/api/mp-webhook'
     | '/admin/aluno/$enrollmentId'
   id:
     | '__root__'
     | '/'
+    | '/checkout'
     | '/_authenticated'
     | '/email-confirmado'
     | '/escolher-area'
@@ -343,6 +399,9 @@ export interface FileRouteTypes {
     | '/manual'
     | '/manual-impressao'
     | '/moda'
+    | '/pagamento/sucesso'
+    | '/pagamento/pendente'
+    | '/pagamento/falhou'
     | '/petshop'
     | '/privacidade'
     | '/redefinir-senha'
@@ -357,11 +416,13 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/tarefas'
     | '/api/public/cron-archive'
+    | '/api/mp-webhook'
     | '/_authenticated/admin/aluno/$enrollmentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   EmailConfirmadoRoute: typeof EmailConfirmadoRoute
   EscolherAreaRoute: typeof EscolherAreaRoute
@@ -374,6 +435,9 @@ export interface RootRouteChildren {
   ManualRoute: typeof ManualRoute
   ManualImpressaoRoute: typeof ManualImpressaoRoute
   ModaRoute: typeof ModaRoute
+  PagamentoSucessoRoute: typeof PagamentoSucessoRoute
+  PagamentoPendenteRoute: typeof PagamentoPendenteRoute
+  PagamentoFalouRoute: typeof PagamentoFalouRoute
   PetshopRoute: typeof PetshopRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
@@ -381,10 +445,46 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermosRoute: typeof TermosRoute
   ApiPublicCronArchiveRoute: typeof ApiPublicCronArchiveRoute
+  ApiMpWebhookRoute: typeof ApiMpWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamento/sucesso': {
+      id: '/pagamento/sucesso'
+      path: '/pagamento/sucesso'
+      fullPath: '/pagamento/sucesso'
+      preLoaderRoute: typeof PagamentoSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamento/pendente': {
+      id: '/pagamento/pendente'
+      path: '/pagamento/pendente'
+      fullPath: '/pagamento/pendente'
+      preLoaderRoute: typeof PagamentoPendenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamento/falhou': {
+      id: '/pagamento/falhou'
+      path: '/pagamento/falhou'
+      fullPath: '/pagamento/falhou'
+      preLoaderRoute: typeof PagamentoFalouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mp-webhook': {
+      id: '/api/mp-webhook'
+      path: '/api/mp-webhook'
+      fullPath: '/api/mp-webhook'
+      preLoaderRoute: typeof ApiMpWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/termos': {
       id: '/termos'
       path: '/termos'
@@ -622,6 +722,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   EmailConfirmadoRoute: EmailConfirmadoRoute,
   EscolherAreaRoute: EscolherAreaRoute,
@@ -634,6 +735,9 @@ const rootRouteChildren: RootRouteChildren = {
   ManualRoute: ManualRoute,
   ManualImpressaoRoute: ManualImpressaoRoute,
   ModaRoute: ModaRoute,
+  PagamentoSucessoRoute: PagamentoSucessoRoute,
+  PagamentoPendenteRoute: PagamentoPendenteRoute,
+  PagamentoFalouRoute: PagamentoFalouRoute,
   PetshopRoute: PetshopRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
@@ -641,6 +745,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermosRoute: TermosRoute,
   ApiPublicCronArchiveRoute: ApiPublicCronArchiveRoute,
+  ApiMpWebhookRoute: ApiMpWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
