@@ -38,7 +38,11 @@ function CheckoutPage() {
       const result = await doCheckout({ data: { planCode, vertical } });
       window.location.href = result.checkoutUrl;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao criar pagamento. Tente novamente.");
+      const msg =
+        e instanceof Error
+          ? e.message
+          : (e as { message?: string })?.message ?? "Erro ao criar pagamento. Tente novamente.";
+      setError(msg);
       setPaying(null);
     }
   }
