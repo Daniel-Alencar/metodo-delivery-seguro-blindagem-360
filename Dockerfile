@@ -21,7 +21,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copia o output do Nitro (server + client estáticos)
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/.output ./.output
 
 # O Nitro node-server é self-contained, não precisa de node_modules
 
@@ -31,4 +31,4 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD ["node", "dist/server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
