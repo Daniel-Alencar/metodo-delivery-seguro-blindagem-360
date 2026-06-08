@@ -1,11 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 import { normalizeEmail } from "@/lib/email-utils";
-import { getSignupEmailStatus } from "@/lib/signup-status.functions";
 
 type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
@@ -18,7 +16,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
-  const checkEmailStatus = useServerFn(getSignupEmailStatus);
+  const navigate = useNavigate();
   const search = Route.useSearch();
   const chosenVertical = search.vertical ?? "food-service";
   const [fullName, setFullName] = useState("");
@@ -34,15 +32,10 @@ function SignupPage() {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
-  const [signedUpEmail, setSignedUpEmail] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
-  const [resendMsg, setResendMsg] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setInfo(null);
     if (!acceptTerms || !acceptLgpd) {
       setError("Você precisa ler e aceitar os Termos de Uso e a Política LGPD.");
       return;
@@ -55,29 +48,11 @@ function SignupPage() {
     setLoading(true);
     const normalizedEmail = normalizeEmail(email);
     if (normalizedEmail !== email) setEmail(normalizedEmail);
-    const existing = await checkEmailStatus({ data: { email: normalizedEmail } });
-    if (existing.exists) {
-      if (existing.confirmed) {
-        setError("Este e-mail já tem conta confirmada. Use a página de login ou recupere a senha.");
-        setSignedUpEmail(null);
-        setLoading(false);
-        return;
-      }
 
-      const resend = await resendConfirmation(normalizedEmail);
-      setSignedUpEmail(normalizedEmail);
-      setInfo(resend.ok
-        ? "Este e-mail já estava cadastrado e ainda não confirmado. Reenviei a confirmação para " + normalizedEmail + ". Verifique a caixa de entrada e o spam."
-        : "Este e-mail já estava cadastrado e ainda não confirmado, mas o reenvio falhou: " + resend.message);
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase.auth.signUp({
+    const { error: signUpError } = await supabase.auth.signUp({
       email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/email-confirmado`,
         data: {
           full_name: fullName,
           company_name: companyName,
@@ -91,45 +66,17 @@ function SignupPage() {
         },
       },
     });
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
       return;
     }
-    if (data.session) await supabase.auth.signOut();
     if (refCode.trim()) {
       try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
     }
 
-    const created = await checkEmailStatus({ data: { email: normalizedEmail } });
-    setSignedUpEmail(normalizedEmail);
-    setInfo(created.confirmationSentAt
-      ? "Conta criada! O e-mail de confirmação foi solicitado para " + normalizedEmail + ". Verifique sua caixa de entrada e o spam para ativar seu acesso."
-      : "Conta criada, mas o sistema não registrou o envio do e-mail de confirmação. Clique em “Reenviar e-mail de confirmação” abaixo.");
-    setLoading(false);
-  }
-
-  async function resendConfirmation(target: string) {
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: target,
-      options: { emailRedirectTo: `${window.location.origin}/email-confirmado` },
-    });
-    return error ? { ok: false, message: error.message } : { ok: true, message: "ok" };
-  }
-
-  async function handleResend() {
-    setResendMsg(null);
-    const target = normalizeEmail(signedUpEmail ?? email);
-    if (!target || !target.includes("@")) {
-      setResendMsg("Informe seu e-mail acima para reenviar a confirmação.");
-      return;
-    }
-    setResending(true);
-    const result = await resendConfirmation(target);
-    setResending(false);
-    if (!result.ok) setResendMsg(`Não foi possível reenviar: ${result.message}`);
-    else setResendMsg("E-mail de confirmação reenviado. Verifique sua caixa de entrada e o spam.");
+    // Conta criada e já logada (sem confirmação de e-mail). Redireciona para o checkout.
+    navigate({ to: "/checkout" });
   }
 
   return (
@@ -198,7 +145,6 @@ function SignupPage() {
           </div>
 
           {error && <p className="text-sm text-red-300">{error}</p>}
-          {info && <p className="text-sm text-emerald-300">{info}</p>}
           <button
             type="submit" disabled={loading}
             className="w-full rounded-full bg-foreground py-3 text-sm font-medium text-background disabled:opacity-50"
@@ -206,21 +152,6 @@ function SignupPage() {
             {loading ? "Criando..." : "Criar minha conta"}
           </button>
         </form>
-
-        {(signedUpEmail || info) && (
-          <div className="mt-6 rounded-md border border-border bg-card/40 p-4 text-sm">
-            <p className="text-muted-foreground">Não recebeu o e-mail de confirmação?</p>
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resending}
-              className="mt-3 inline-flex items-center justify-center rounded-full border border-border bg-card px-4 py-2 text-xs font-medium hover:bg-card/70 disabled:opacity-50"
-            >
-              {resending ? "Reenviando..." : "Reenviar e-mail de confirmação"}
-            </button>
-            {resendMsg && <p className="mt-2 text-xs text-muted-foreground">{resendMsg}</p>}
-          </div>
-        )}
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem conta? <Link to="/login" className="text-foreground hover:underline">Entrar</Link>
