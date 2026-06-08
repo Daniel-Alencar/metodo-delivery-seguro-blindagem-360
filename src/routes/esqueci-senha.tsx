@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
+import { normalizeEmail } from "@/lib/email-utils";
+import { adminResetPassword } from "@/lib/admin-reset-password.functions";
 
 export const Route = createFileRoute("/esqueci-senha")({
   head: () => ({ meta: [{ title: "Recuperar senha — Blindagem 360º" }] }),
@@ -9,7 +12,9 @@ export const Route = createFileRoute("/esqueci-senha")({
 });
 
 function ForgotPasswordPage() {
+  const doReset = useServerFn(adminResetPassword);
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,12 +22,15 @@ function ForgotPasswordPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true); setError(null); setInfo(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/redefinir-senha`,
-    });
+    const normalized = normalizeEmail(email);
+    if (normalized !== email) setEmail(normalized);
+    try {
+      await doReset({ data: { email: normalized, newPassword } });
+      setInfo("Se este e-mail estiver cadastrado, a senha foi redefinida com sucesso. Volte ao login para entrar.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao redefinir senha.");
+    }
     setLoading(false);
-    if (error) { setError(error.message); return; }
-    setInfo("Se este e-mail estiver cadastrado, enviamos um link para você redefinir a senha.");
   }
 
   return (
@@ -38,7 +46,7 @@ function ForgotPasswordPage() {
       </header>
       <main className="relative mx-auto flex max-w-md flex-col px-6 pt-10 pb-20">
         <h1 className="text-3xl font-semibold tracking-tight text-gradient">Recuperar senha</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Informe seu e-mail e enviaremos um link para criar uma nova senha.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Informe seu e-mail e escolha uma nova senha.</p>
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           <div>
             <label className="text-xs uppercase tracking-wider text-muted-foreground">E-mail</label>
@@ -48,11 +56,17 @@ function ForgotPasswordPage() {
               autoComplete="email"
             />
           </div>
+          <div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">Nova senha (mín. 6 caracteres)</label>
+            <div className="mt-1">
+              <PasswordInput value={newPassword} onChange={setNewPassword} required autoComplete="new-password" />
+            </div>
+          </div>
           {error && <p className="text-sm text-red-300">{error}</p>}
           {info && <p className="text-sm text-emerald-300">{info}</p>}
           <button type="submit" disabled={loading}
             className="w-full rounded-full bg-foreground py-3 text-sm font-medium text-background disabled:opacity-50">
-            {loading ? "Enviando..." : "Enviar link de recuperação"}
+            {loading ? "Redefinindo..." : "Redefinir senha"}
           </button>
         </form>
       </main>

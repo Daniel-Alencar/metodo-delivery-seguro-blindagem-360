@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordInput } from "@/components/PasswordInput";
 import { normalizeEmail } from "@/lib/email-utils";
+import { adminCreateUser } from "@/lib/admin-signup.functions";
 
 type SignupSearch = { vertical?: string; ref?: string };
 export const Route = createFileRoute("/signup")({
@@ -17,6 +19,7 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const doAdminSignup = useServerFn(adminCreateUser);
   const search = Route.useSearch();
   const chosenVertical = search.vertical ?? "food-service";
   const [fullName, setFullName] = useState("");
@@ -49,34 +52,44 @@ function SignupPage() {
     const normalizedEmail = normalizeEmail(email);
     if (normalizedEmail !== email) setEmail(normalizedEmail);
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: normalizedEmail,
-      password,
-      options: {
+    try {
+      // 1. Create user via Admin API (server-side) — no confirmation email sent
+      await doAdminSignup({
         data: {
+          email: normalizedEmail,
+          password,
           full_name: fullName,
           company_name: companyName,
           phone,
           cpf: cpfDigits,
           cnpj: cnpj.replace(/\D/g, ""),
           vertical: chosenVertical,
-          accepted_terms: true,
-          accepted_lgpd: true,
           marketing_consent: marketingConsent,
         },
-      },
-    });
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-    if (refCode.trim()) {
-      try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
-    }
+      });
 
-    // Conta criada e já logada (sem confirmação de e-mail). Redireciona para o checkout.
-    navigate({ to: "/checkout" });
+      // 2. Sign in with the new credentials on the client side
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+      if (signInError) {
+        setError("Conta criada, mas falhou ao entrar automaticamente. Use a página de login.");
+        setLoading(false);
+        return;
+      }
+
+      if (refCode.trim()) {
+        try { localStorage.setItem("pendingReferralCode", refCode.trim().toUpperCase()); } catch { /* ignore */ }
+      }
+
+      // 3. Redirect to checkout
+      navigate({ to: "/checkout" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro ao criar conta. Tente novamente.";
+      setError(msg);
+      setLoading(false);
+    }
   }
 
   return (
