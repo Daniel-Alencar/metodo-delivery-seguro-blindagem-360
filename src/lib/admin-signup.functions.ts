@@ -54,3 +54,4 @@ export const adminCreateUser = createServerFn({ method: "POST" })
 
     return { userId: created.user.id, email: created.user.email };
   });
+
