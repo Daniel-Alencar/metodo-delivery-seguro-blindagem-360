@@ -37,7 +37,7 @@ export const createMpCheckout = createServerFn({ method: 'POST' })
     const mp = getMpClient();
     const externalRef = `${userId}:${plan.id}:${data.vertical}`;
 
-    if (plan.billing_interval === 'once') {
+    if (plan.billing_interval === 'once' || plan.billing_interval === 'one_time') {
       // Plano A: pagamento único via Checkout Pro
       const preferenceApi = new Preference(mp);
       const pref = await preferenceApi.create({
@@ -66,6 +66,11 @@ export const createMpCheckout = createServerFn({ method: 'POST' })
         },
       });
 
+      if (!pref.id || !pref.init_point) {
+        console.error('[mp-checkout] Preference creation returned incomplete data:', JSON.stringify(pref));
+        throw new Error('Erro ao criar preferência de pagamento no Mercado Pago.');
+      }
+
       await upsertSubscription(userId, plan.id, {
         status: 'pending',
         mp_preference_id: pref.id ?? null,
@@ -73,44 +78,46 @@ export const createMpCheckout = createServerFn({ method: 'POST' })
         mp_preapproval_id: null,
       });
 
-      return { checkoutUrl: pref.init_point! };
+      return { checkoutUrl: pref.init_point };
 
     } else {
       // Plano B: assinatura recorrente via PreApprovalPlan
-      // O MP exige card_token_id para criar uma PreApproval via API.
-      // O fluxo correto é redirecionar para o init_point do PreApprovalPlan,
-      // onde o usuário preenche os dados do cartão no lado do Mercado Pago.
       const planApi = new PreApprovalPlan(mp);
       let mpPlanId = plan.mp_plan_id;
-      let checkoutUrl: string;
+      let checkoutUrl: string | undefined;
 
-      if (!mpPlanId) {
-        const planRes = await planApi.create({
-          body: {
-            reason: plan.name,
-            auto_recurring: {
-              frequency: 1,
-              frequency_type: 'months',
-              transaction_amount: plan.amount_cents / 100,
-              currency_id: 'BRL',
-            },
-            back_url: `${siteUrl}/pagamento/sucesso`,
-            notification_url: `${siteUrl}/api/mp-webhook`,
-            status: 'active',
+      // Always create a fresh PreApprovalPlan to avoid stale/invalid cached IDs
+      // The previous approach of caching mp_plan_id caused "template with id undefined" errors
+      // when the cached ID became invalid (sandbox vs production, deleted plans, etc.)
+      const planRes = await planApi.create({
+        body: {
+          reason: plan.name,
+          auto_recurring: {
+            frequency: 1,
+            frequency_type: 'months',
+            transaction_amount: plan.amount_cents / 100,
+            currency_id: 'BRL',
           },
-        });
-        mpPlanId = planRes.id ?? null;
-        checkoutUrl = planRes.init_point!;
-        if (mpPlanId) {
-          await supabaseAdmin.from('plans').update({ mp_plan_id: mpPlanId }).eq('id', plan.id);
-        }
-      } else {
-        // Plano já existe: busca o init_point no MP
-        const planData = await planApi.get({ id: mpPlanId });
-        checkoutUrl = planData.init_point!;
+          back_url: `${siteUrl}/pagamento/sucesso`,
+          // notification_url is not in the PreApprovalPlan type but the API accepts it
+          // @ts-expect-error -- MP REST API supports this field
+          notification_url: `${siteUrl}/api/mp-webhook`,
+          status: 'active',
+        },
+      });
+
+      mpPlanId = planRes.id ?? null;
+      checkoutUrl = planRes.init_point ?? undefined;
+
+      if (mpPlanId) {
+        // Cache the new plan ID for reference (not for reuse, since we always create fresh)
+        await supabaseAdmin.from('plans').update({ mp_plan_id: mpPlanId }).eq('id', plan.id);
       }
 
-      if (!checkoutUrl) throw new Error('Não foi possível obter o link de assinatura.');
+      if (!checkoutUrl) {
+        console.error('[mp-checkout] PreApprovalPlan creation returned no init_point:', JSON.stringify(planRes));
+        throw new Error('Não foi possível obter o link de assinatura.');
+      }
 
       await upsertSubscription(userId, plan.id, {
         status: 'pending',
